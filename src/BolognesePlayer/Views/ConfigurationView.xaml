@@ -1,0 +1,76 @@
+﻿<UserControl x:Class="Bolognese.Desktop.Views.ConfigurationView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:local="clr-namespace:Bolognese.Desktop.Views"
+             TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+             Background="Black"
+             TextElement.FontWeight="Medium"
+             TextElement.FontSize="12"
+             FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="600">
+    <StackPanel>
+        <GroupBox Header="Audio Settings">
+            <StackPanel>
+                <DockPanel>
+                    <Label Content="Play From" Width="75" />
+                    <TextBox x:Name="AudioFilePath" TextWrapping="Wrap" IsEnabled="True" HorizontalAlignment="Left" Width="300"/>
+                </DockPanel>
+                <DockPanel Margin="0,5,0,0">
+                    <Label Content="Shuffle" Width="75" />
+                    <ToggleButton Name="Shuffle"
+                                  Style="{DynamicResource MaterialDesignActionToggleButton}"
+                                  Width="25" Height="25"
+                                  IsChecked="{Binding Shuffle, Mode=TwoWay}"
+                                  HorizontalAlignment="Left">
+                        <ToggleButton.Content>
+                            <materialDesign:PackIcon Kind="Shuffle"/>
+                        </ToggleButton.Content>
+                    </ToggleButton>
+                </DockPanel>
+            </StackPanel>
+        </GroupBox>
+        <GroupBox Header="Pomodoro Settings" Margin="0,5,0,0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="200"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Label Content="Short Break Duration" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Right"/>
+                <TextBox Grid.Row="0" x:Name="ShortBreakDuration" HorizontalAlignment="Left" Grid.Column="1" Margin="5,2,20,2"/>
+                <Label Content="Long Break Duration" HorizontalAlignment="Right" Grid.Column="0" Grid.Row="1"/>
+                <TextBox x:Name="LongBreakDuration" Margin="5,2,20,2" Grid.Column="1" Grid.Row="1"/>
+                <Label Content="Pomodoros Before Long Break" HorizontalAlignment="Right" Grid.Column="0" Grid.Row="2"/>
+                <TextBox x:Name="LongBreakCount" Margin="5,2,20,2" Grid.Column="1" Grid.Row="2" HorizontalAlignment="Left" />
+                <Button x:Name="SaveConfiguration" Grid.Row="3" Grid.Column="0" HorizontalAlignment="Left"
+                Width="150">
+                    <Button.Content>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Padding="0 0 10 0">Save</TextBlock>
+                            <materialDesign:PackIcon Kind="ContentSaveSettings" />
+                        </StackPanel>
+                    </Button.Content>
+                </Button>
+                <Button x:Name="CancelChanges" Grid.Row="3" Grid.Column="1"
+                        Width="150" HorizontalAlignment="Right">
+                    <Button.Content>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Padding="0 0 10 0">Cancel</TextBlock>
+                            <materialDesign:PackIcon Kind="Undo" />
+                        </StackPanel>
+                    </Button.Content>
+                </Button>
+            </Grid>
+        </GroupBox>
+    </StackPanel>
+</UserControl>

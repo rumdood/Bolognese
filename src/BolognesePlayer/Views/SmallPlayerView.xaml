@@ -1,0 +1,48 @@
+﻿<UserControl x:Class="Bolognese.Desktop.Views.SmallPlayerView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:UIControls="clr-namespace:Bolognese.Desktop.Controls"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+             TextElement.FontWeight="Medium"
+             TextElement.FontSize="14"
+             FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto"
+             xmlns:local="clr-namespace:Bolognese.Desktop.Views"
+             mc:Ignorable="d" 
+             d:DesignHeight="95" d:DesignWidth="200"
+             Background="Black">
+    <Grid x:Name="LayoutRoot" VerticalAlignment="Center" HorizontalAlignment="Center" Width="200">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="75"/>
+            <RowDefinition Height="20"/>
+        </Grid.RowDefinitions>
+        <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="0">
+            <ToggleButton x:Name="PlayPause" 
+                          Margin="5 10 5 10" 
+                          Style="{DynamicResource MaterialDesignActionToggleButton}"
+                          IsChecked="{Binding IsPlaying, Mode=OneWay}">
+                <ToggleButton.Content>
+                    <materialDesign:PackIcon Kind="{Binding PlayPauseFrontIcon}" />
+                </ToggleButton.Content> 
+                <materialDesign:ToggleButtonAssist.OnContent>
+                    <materialDesign:PackIcon Kind="{Binding PlayPauseBackIcon}" />
+                </materialDesign:ToggleButtonAssist.OnContent>
+            </ToggleButton>
+            <UIControls:CircularProgressBar HorizontalAlignment="Center" 
+                                            VerticalAlignment="Center" 
+                                            StrokeThickness="10" 
+                                            SegmentColor="DarkGray" 
+                                            Percentage="100" />
+            <UIControls:CircularProgressBar HorizontalAlignment="Center" 
+                                            VerticalAlignment="Center" 
+                                            StrokeThickness="10" 
+                                            SegmentColor="{Binding Path=ProgressBrush}" 
+                                            Percentage="{Binding Path=CurrentSongProgress}" />
+        </Grid>
+        <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="1">
+            <TextBlock Foreground="Gray" x:Name="CurrentSongTitle" Width="100"/>
+        </Grid>
+    </Grid>
+</UserControl>

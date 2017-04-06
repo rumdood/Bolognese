@@ -1,0 +1,35 @@
+﻿<Window x:Class="Bolognese.Desktop.ShellView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Bolognese.Desktop"
+             xmlns:cal="http://www.caliburnproject.org"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+             TextElement.FontWeight="Medium"
+             TextElement.FontSize="14"
+             Background="Black"
+             FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto"
+             mc:Ignorable="d" 
+             WindowStyle="None"
+             Width="200"
+             Height="110"
+             >
+    <Grid>
+        <StackPanel Orientation="Vertical">
+            <DockPanel>
+                <Button x:Name="ShowConfiguration" Style="{StaticResource MaterialDesignFloatingActionMiniButton}"
+                        HorizontalAlignment="Left" DockPanel.Dock="Left" Width="20" Height="20">
+                        <materialDesign:PackIcon Kind="Settings" />
+                    </Button>
+                <Button x:Name="CloseWindow" 
+                              Style="{StaticResource MaterialDesignFloatingActionMiniButton}" 
+                              Width="20" Height="20" DockPanel.Dock="Right" HorizontalAlignment="Right">
+                    <materialDesign:PackIcon Kind="Close" />
+                </Button>
+            </DockPanel>
+            <ContentControl x:Name="ActiveItem" />
+        </StackPanel>
+    </Grid>
+</Window>
