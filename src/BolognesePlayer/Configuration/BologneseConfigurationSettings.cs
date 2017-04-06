@@ -12,24 +12,22 @@ namespace Bolognese.Desktop
             get { return "UserSettings"; }
         }
 
-        string _audioFilePath = string.Empty;
-        bool _shuffle = false;
-        int _shortBreakDuration = 10;
-        int _longBreakDuration = 30;
-        int _longBreakCount = 3;
+        private const int DefaultShortDuration = 5;
+        private const int DefaultLongDuration = 30;
+        private const int DefaultPomodorosBeforeLongBreak = 4;
 
         [ConfigurationProperty("AudioFilePath", IsRequired = true)]
         public string AudioFilePath
         {
-            get { return _audioFilePath; }
-            set { _audioFilePath = value; }
+            get { return this["AudioFilePath"].ToString(); }
+            set { this["AudioFilePath"] = value; }
         }
 
         [ConfigurationProperty("Shuffle", IsRequired = true)]
         public bool Shuffle
         {
-            get { return _shuffle; }
-            set { _shuffle = value; }
+            get { return (bool)this["Shuffle"]; }
+            set { this["Shuffle"] = value; }
         }
 
         /// <summary>
@@ -38,11 +36,17 @@ namespace Bolognese.Desktop
         [ConfigurationProperty("LongBreakCount", IsRequired = true)]
         public int LongBreakCount
         {
-            get { return _longBreakCount; }
-            set
+            get
             {
-                _longBreakCount = value;
+                int longBreak = (int)this["LongBreakCount"];
+                if (longBreak == 0)
+                {
+                    longBreak = DefaultPomodorosBeforeLongBreak;
+                }
+
+                return longBreak;
             }
+            set { this["LongBreakCount"] = value; }
         }
 
         /// <summary>
@@ -51,8 +55,17 @@ namespace Bolognese.Desktop
         [ConfigurationProperty("ShortBreakDuration", IsRequired = true)]
         public int ShortBreakDuration
         {
-            get { return _shortBreakDuration; }
-            set { _shortBreakDuration = value; }
+            get
+            {
+                int shortDuration = (int)this["ShortBreakDuration"];
+                if (shortDuration == 0)
+                {
+                    shortDuration = DefaultShortDuration;
+                }
+
+                return shortDuration;
+            }
+            set { this["ShortBreakDuration"] = value; }
         }
 
         /// <summary>
@@ -61,13 +74,22 @@ namespace Bolognese.Desktop
         [ConfigurationProperty("LongBreakDuration", IsRequired = true)]
         public int LongBreakDuration
         {
-            get { return _longBreakDuration; }
-            set { _longBreakDuration = value; }
+            get
+            {
+                int longDuration = (int)this["LongBreakDuration"];
+                if (longDuration == 0)
+                {
+                    longDuration = DefaultLongDuration;
+                }
+
+                return longDuration;
+            }
+            set { this["LongBreakDuration"] = value; }
         }
 
         public void Save()
         {
-            CurrentConfiguration.Save(ConfigurationSaveMode.Modified, true);
+            CurrentConfiguration.Save(ConfigurationSaveMode.Full, true);
         }
 
         private static void InitializeConfigurationSettings()
