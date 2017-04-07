@@ -32,7 +32,17 @@ namespace Bolognese.Desktop
         private void ChangePlayingStatus(PlayingStatus status)
         {
             _status = status;
-            _events.PublishOnUIThread(new PlayerStatusChanged(_status));
+
+            if (_currentSong == null
+                || _status == PlayingStatus.LongBreak 
+                || _status == PlayingStatus.ShortBreak)
+            {
+                _events.PublishOnUIThread(new PlayerStatusChanged(_status));
+            }
+            else
+            {
+                _events.PublishOnUIThread(new PlayerStatusChanged(_status, _currentSong.Name));
+            }
         }
 
         public TrackManager(IEventAggregator events)
@@ -43,8 +53,10 @@ namespace Bolognese.Desktop
             _shortBreakDuration = TimeSpan.FromMinutes(_settings.ShortBreakDuration).TotalSeconds;
             _longBreakDuration = TimeSpan.FromMinutes(_settings.LongBreakDuration).TotalSeconds;
 
-            _songTimer = new DispatcherTimer();
-            _songTimer.Interval = TimeSpan.FromMilliseconds(200);
+            _songTimer = new DispatcherTimer()
+            {
+                Interval = TimeSpan.FromMilliseconds(200)
+            };
             _songTimer.Tick += SongTimer_Tick; ;
 
             _player = new MediaPlayer();
@@ -55,48 +67,50 @@ namespace Bolognese.Desktop
 
         private void SongTimer_Tick(object sender, EventArgs e)
         {
-            double statusValue = 0;
             ITrackManager mgr = this as ITrackManager;
 
             if (_status == PlayingStatus.LongBreak ||
                 _status == PlayingStatus.ShortBreak ||
                 _status == PlayingStatus.Playing)
             {
+                TimeSpan segmentTotal = new TimeSpan();
+                TimeSpan progressTotal = new TimeSpan();
+
                 switch (_status)
                 {
                     case PlayingStatus.Playing:
-                        statusValue = (_player.Position.TotalSeconds / _player.NaturalDuration.TimeSpan.TotalSeconds) * 100;
+                        segmentTotal = _player.NaturalDuration.TimeSpan;
+                        progressTotal = _player.Position;
                         break;
                     case PlayingStatus.ShortBreak:
-                        _currentBreakTime = _currentBreakTime.Add(TimeSpan.FromMilliseconds(200));
+                        segmentTotal = TimeSpan.FromMinutes(_shortBreakDuration);
+                        _currentBreakTime = _currentBreakTime.Add(_songTimer.Interval);
+                        progressTotal = _currentBreakTime;
 
                         if (_currentBreakTime.TotalSeconds >= _shortBreakDuration)
                         {
                             ChangePlayingStatus(PlayingStatus.ReadyToPlay);
                         }
-                        else
-                        {
-                            statusValue = (_shortBreakDuration - _currentBreakTime.TotalSeconds) / _shortBreakDuration * 100;
-                        }
+
                         break;
                     case PlayingStatus.LongBreak:
-                        _currentBreakTime = _currentBreakTime.Add(TimeSpan.FromMilliseconds(200));
+                        segmentTotal = TimeSpan.FromMinutes(_longBreakDuration);
+                        _currentBreakTime = _currentBreakTime.Add(_songTimer.Interval);
+                        progressTotal = _currentBreakTime;
 
                         if (_currentBreakTime.TotalSeconds >= _longBreakDuration)
                         {
                             ChangePlayingStatus(PlayingStatus.ReadyToPlay);
                         }
-                        else
-                        {
-                            statusValue = (_longBreakDuration - _currentBreakTime.TotalSeconds) / _longBreakDuration * 100;
-                        }
+
                         break;
                     default:
                         // how the hell did we get HERE?
                         break;
                 }
 
-                _events.PublishOnUIThread(new SegmentProgressChanged(statusValue));
+                SegmentProgressChanged changedEvent = new SegmentProgressChanged(segmentTotal, progressTotal);
+                _events.PublishOnUIThread(changedEvent);
             }
         }
 

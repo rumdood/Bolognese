@@ -11,7 +11,7 @@
              FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto"
              xmlns:local="clr-namespace:Bolognese.Desktop.Views"
              mc:Ignorable="d" 
-             d:DesignHeight="95" d:DesignWidth="200"
+             d:DesignHeight="100" d:DesignWidth="200"
              Background="Black">
     <Grid x:Name="LayoutRoot" VerticalAlignment="Center" HorizontalAlignment="Center" Width="200">
         <Grid.RowDefinitions>
@@ -33,13 +33,13 @@
             <UIControls:CircularProgressBar HorizontalAlignment="Center" 
                                             VerticalAlignment="Center" 
                                             StrokeThickness="10" 
-                                            SegmentColor="DarkGray" 
+                                            SegmentColor="Green" 
                                             Percentage="100" />
             <UIControls:CircularProgressBar HorizontalAlignment="Center" 
                                             VerticalAlignment="Center" 
                                             StrokeThickness="10" 
-                                            SegmentColor="{Binding Path=ProgressBrush}" 
-                                            Percentage="{Binding Path=CurrentSongProgress}" />
+                                            SegmentColor="Red" 
+                                            Percentage="{Binding Path=CurrentSegmentProgress}" />
         </Grid>
         <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="1">
             <TextBlock Foreground="Gray" x:Name="CurrentSongTitle" Width="100"/>

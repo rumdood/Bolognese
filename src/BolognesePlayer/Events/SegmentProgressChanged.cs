@@ -8,15 +8,22 @@ namespace Bolognese.Desktop
 {
     public class SegmentProgressChanged
     {
-        private double _progress = 0;
+        private TimeSpan _progress;
+        private TimeSpan _totalLength;
 
-        public double Progress
+        public TimeSpan Progress
         {
             get { return _progress; }
         }
 
-        public SegmentProgressChanged(double progress)
+        public TimeSpan TotalTime
         {
+            get { return _totalLength; }
+        }
+
+        public SegmentProgressChanged(TimeSpan total, TimeSpan progress)
+        {
+            _totalLength = total;
             _progress = progress;
         }
     }

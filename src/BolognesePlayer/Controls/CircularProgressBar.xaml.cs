@@ -7,6 +7,8 @@ namespace Bolognese.Desktop.Controls
 {
     /// <summary>
     /// Interaction logic for RadialCountdownControl.xaml
+    /// 
+    /// Code nicked from http://timokorinth.de/creating-circular-progress-bar-wpf-silverlight/
     /// </summary>
     public partial class CircularProgressBar : UserControl
     {

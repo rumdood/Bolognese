@@ -3,6 +3,7 @@ using System.Windows.Media;
 using Caliburn.Micro;
 using MaterialDesignThemes.Wpf;
 using Bolognese.Desktop.Tracks;
+using System;
 
 namespace Bolognese.Desktop.ViewModels
 {
@@ -18,7 +19,7 @@ namespace Bolognese.Desktop.ViewModels
         private readonly IConfigurationSettings _settings;
         private readonly ITrackManager _manager;
         private Playlist _currentPlaylist;
-        private double _currentSongProgress = 0;
+        private double _currentSegmentProgress = 0;
         private string _currentSongTitle = "";
         private PlayingStatus _currentStatus = PlayingStatus.Stopped;
         private Brush _progressBrush = Brushes.Green;
@@ -65,19 +66,6 @@ namespace Bolognese.Desktop.ViewModels
             }
         }
 
-        public Brush ProgressBrush
-        {
-            get
-            {
-                return _progressBrush;
-            }
-            set
-            {
-                _progressBrush = value;
-                NotifyOfPropertyChange(() => ProgressBrush);
-            }
-        }
-
         public Playlist CurrentPlaylist
         {
             get { return _currentPlaylist; }
@@ -98,13 +86,13 @@ namespace Bolognese.Desktop.ViewModels
             }
         }
 
-        public double CurrentSongProgress
+        public double CurrentSegmentProgress
         {
-            get { return _currentSongProgress; }
+            get { return _currentSegmentProgress; }
             set
             {
-                _currentSongProgress = value;
-                NotifyOfPropertyChange(() => CurrentSongProgress);
+                _currentSegmentProgress = value;
+                NotifyOfPropertyChange(() => CurrentSegmentProgress);
             }
         }
 
@@ -121,12 +109,10 @@ namespace Bolognese.Desktop.ViewModels
                     if (CurrentStatus == PlayingStatus.Playing)
                     {
                         IsPlaying = true;
-                        ProgressBrush = Brushes.Green;
                     }
                     else
                     {
                         IsPlaying = false;
-                        ProgressBrush = Brushes.Red;
                     }
 
                     if (CurrentStatus == PlayingStatus.ShortBreak)
@@ -157,17 +143,21 @@ namespace Bolognese.Desktop.ViewModels
             _settings = BologneseConfigurationSettings.GetConfigurationSettings();
             _manager = manager;
 
-            Playlist playlist = new Playlist();
-            playlist.Name = "New";
-            DirectoryInfo directory = new DirectoryInfo(_settings.AudioFilePath);
-            foreach (FileInfo file in directory.GetFiles("*.mp3"))
+            if (_settings.AudioFilePath != string.Empty 
+                || Directory.Exists(_settings.AudioFilePath))
             {
-                Song song = new Song(file.FullName, file.Name);
-                playlist.Songs.Add(song);
-            }
+                Playlist playlist = new Playlist();
+                playlist.Name = "New";
+                DirectoryInfo directory = new DirectoryInfo(_settings.AudioFilePath);
+                foreach (FileInfo file in directory.GetFiles("*.mp3"))
+                {
+                    Song song = new Song(file.FullName, file.Name);
+                    playlist.Songs.Add(song);
+                }
 
-            CurrentPlaylist = playlist;
-            _manager.OpenPlaylist(playlist);
+                CurrentPlaylist = playlist;
+                _manager.OpenPlaylist(playlist);
+            }
         }
 
         public void PlayPause()
@@ -192,11 +182,24 @@ namespace Bolognese.Desktop.ViewModels
         public void Handle(PlayerStatusChanged playerStatus)
         {
             CurrentStatus = playerStatus.CurrentStatus;
+            CurrentSongTitle = playerStatus.CurrentTrackTitle;
         }
 
         public void Handle(SegmentProgressChanged segmentProgress)
         {
-            CurrentSongProgress = segmentProgress.Progress;
+            CurrentSegmentProgress = CalculateSegmentProgress(segmentProgress.TotalTime, segmentProgress.Progress);
+        }
+
+        private double CalculateSegmentProgress(TimeSpan totalTime, TimeSpan progress)
+        {
+            double segmentProgress = (progress.TotalSeconds / totalTime.TotalSeconds) * 100;
+
+            if (CurrentStatus == PlayingStatus.ShortBreak || CurrentStatus == PlayingStatus.LongBreak)
+            {
+                segmentProgress = 100 - segmentProgress; // reverse this so that it counts down instead of up
+            }
+
+            return segmentProgress;
         }
     }
 }

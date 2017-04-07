@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26403.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BolognesePlayer", "BolognesePlayer\BolognesePlayer.csproj", "{7F56FC2F-59DA-4D83-B72D-2B585C96A7CC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BolognesePlayerTests", "BolognesePlayerTests\BolognesePlayerTests.csproj", "{6DDA022E-042D-409C-97E8-6087BFFD85A0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{7F56FC2F-59DA-4D83-B72D-2B585C96A7CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7F56FC2F-59DA-4D83-B72D-2B585C96A7CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7F56FC2F-59DA-4D83-B72D-2B585C96A7CC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6DDA022E-042D-409C-97E8-6087BFFD85A0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6DDA022E-042D-409C-97E8-6087BFFD85A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6DDA022E-042D-409C-97E8-6087BFFD85A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6DDA022E-042D-409C-97E8-6087BFFD85A0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
