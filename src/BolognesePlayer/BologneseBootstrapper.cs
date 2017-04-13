@@ -39,7 +39,8 @@ namespace Bolognese.Desktop
         {
             _container.Singleton<IEventAggregator, EventAggregator>();
             _container.Singleton<IWindowManager, WindowManager>();
-            _container.Singleton<ITrackManager, TrackManager>();
+            _container.Singleton<ITrackManager, PomodoroManager>();
+            _container.Singleton<ISongFactory, SongFactory>();
             _container.PerRequest<IShell, ShellViewModel>();
 
             _container.Singleton<Screen, SmallPlayerViewModel>("player");

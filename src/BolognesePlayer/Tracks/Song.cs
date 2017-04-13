@@ -9,12 +9,12 @@ namespace Bolognese.Desktop.Tracks
     public class Song
     {
         public string FilePath { get; set; }
-        public string Name { get; set; }
+        public string Title { get; set; }
 
         public Song(string filePath, string name)
         {
             FilePath = filePath;
-            Name = name;
+            Title = name;
         }
     }
 }

@@ -55,27 +55,27 @@ namespace Bolognese.Desktop.ViewModels.Tests
         }
 
         [TestMethod()]
-        public void SegmentProgressShouldBePositiveWhilePlaying()
+        public void SegmentProgressShouldBeNegativeWhilePlaying()
         {
             SubscribeToEvents();
 
             PlayerStatusChanged status = new PlayerStatusChanged(Tracks.PlayingStatus.Playing);
             _vm.Handle(status);
 
-            double targetPercentage = 30;
+            double targetPercentage = 70;
             double actualPercentage = GetProgressPercentage();
 
             Assert.AreEqual(targetPercentage, actualPercentage, $"Progress percentage should be {targetPercentage}, got {actualPercentage}");
         }
 
         [TestMethod()]
-        public void SegmentProgressShouldBeNegativeWhileBreaking()
+        public void SegmentProgressShouldBePositiveWhileBreaking()
         {
             SubscribeToEvents();
             PlayerStatusChanged status = new PlayerStatusChanged(Tracks.PlayingStatus.ShortBreak);
             _vm.Handle(status);
 
-            double targetPercentage = 70;
+            double targetPercentage = 30;
             double actualPercentage = GetProgressPercentage();
 
             Assert.AreEqual(targetPercentage, actualPercentage, $"Progress percentage should be {targetPercentage}, got {actualPercentage}");
@@ -110,6 +110,20 @@ namespace Bolognese.Desktop.ViewModels.Tests
             _vm.PlayPause();
 
             Assert.AreEqual(Tracks.PlayingStatus.Playing, _vm.CurrentStatus);
+        }
+
+        [TestMethod()]
+        public void TimeRemainingShouldUpdate()
+        {
+            SubscribeToEvents();
+            TimeSpan totalTime = TimeSpan.FromSeconds(60);
+            TimeSpan currentPosition = TimeSpan.FromSeconds(18);
+
+            SegmentProgressChanged songProgress = new SegmentProgressChanged(totalTime, currentPosition);
+            _vm.Handle(songProgress);
+
+            TimeSpan target = TimeSpan.FromSeconds(42);
+            Assert.AreEqual(target, _vm.TimeRemaining, "TimeRemaining should be 42 seconds");
         }
     }
 }

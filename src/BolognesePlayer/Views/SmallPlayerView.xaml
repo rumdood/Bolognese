@@ -14,11 +14,16 @@
              d:DesignHeight="100" d:DesignWidth="200"
              Background="Black">
     <Grid x:Name="LayoutRoot" VerticalAlignment="Center" HorizontalAlignment="Center" Width="200">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="3*"/>
+            <ColumnDefinition Width="1*"/>
+        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="75"/>
             <RowDefinition Height="20"/>
         </Grid.RowDefinitions>
-        <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="0">
+        <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="0" Grid.Column="1">
             <ToggleButton x:Name="PlayPause" 
                           Margin="5 10 5 10" 
                           Style="{DynamicResource MaterialDesignActionToggleButton}"
@@ -33,16 +38,23 @@
             <UIControls:CircularProgressBar HorizontalAlignment="Center" 
                                             VerticalAlignment="Center" 
                                             StrokeThickness="10" 
-                                            SegmentColor="Green" 
+                                            SegmentColor="Red" 
                                             Percentage="100" />
             <UIControls:CircularProgressBar HorizontalAlignment="Center" 
                                             VerticalAlignment="Center" 
                                             StrokeThickness="10" 
-                                            SegmentColor="Red" 
+                                            SegmentColor="Green" 
                                             Percentage="{Binding Path=CurrentSegmentProgress}" />
         </Grid>
-        <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="1">
-            <TextBlock Foreground="Gray" x:Name="CurrentSongTitle" Width="100"/>
+        <TextBlock Name="TimeRemaining" 
+                   Grid.Row="1" 
+                   Grid.Column="2"
+                   VerticalAlignment="Center" 
+                   HorizontalAlignment="Center"
+                   Foreground="Gray"
+                   Text="{Binding TimeRemaining,StringFormat=mm\\:ss}"/>
+        <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="1" Grid.Column="1">
+            <TextBlock Foreground="Gray" x:Name="CurrentSongTitle" Width="100" HorizontalAlignment="Center"/>
         </Grid>
     </Grid>
 </UserControl>

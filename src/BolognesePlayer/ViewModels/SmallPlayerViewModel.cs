@@ -26,6 +26,7 @@ namespace Bolognese.Desktop.ViewModels
         private PackIconKind _playPauseFront = PlayIcon;
         private PackIconKind _playPauseBack = PauseIcon;
         private bool _isPlaying = false;
+        private TimeSpan _timeRemaining = TimeSpan.FromSeconds(0);
 
         public bool IsPlaying
         {
@@ -37,6 +38,19 @@ namespace Bolognese.Desktop.ViewModels
             {
                 _isPlaying = value;
                 NotifyOfPropertyChange(() => IsPlaying);
+            }
+        }
+
+        public TimeSpan TimeRemaining
+        {
+            get
+            {
+                return _timeRemaining;
+            }
+            set
+            {
+                _timeRemaining = value;
+                NotifyOfPropertyChange(() => TimeRemaining);
             }
         }
 
@@ -115,21 +129,19 @@ namespace Bolognese.Desktop.ViewModels
                         IsPlaying = false;
                     }
 
-                    if (CurrentStatus == PlayingStatus.ShortBreak)
+                    switch (CurrentStatus)
                     {
-                        PlayPauseFrontIcon = ShortBreakIcon;
-                    }
-                    else if (CurrentStatus == PlayingStatus.LongBreak)
-                    {
-                        PlayPauseFrontIcon = LongBreakIcon;
-                    }
-                    else if (CurrentStatus == PlayingStatus.Error)
-                    {
-                        PlayPauseFrontIcon = ErrorIcon;
-                    }
-                    else
-                    {
-                        PlayPauseFrontIcon = PlayIcon;
+                        case PlayingStatus.ShortBreak:
+                        case PlayingStatus.LongBreak:
+                            PlayPauseFrontIcon = ShortBreakIcon;
+                            break;
+                        case PlayingStatus.ReadyToPlay:
+                        case PlayingStatus.Paused:
+                            PlayPauseFrontIcon = PlayIcon;
+                            break;
+                        default:
+                            PlayPauseFrontIcon = ErrorIcon;
+                            break;
                     }
                 }
             }
@@ -143,21 +155,7 @@ namespace Bolognese.Desktop.ViewModels
             _settings = BologneseConfigurationSettings.GetConfigurationSettings();
             _manager = manager;
 
-            if (_settings.AudioFilePath != string.Empty 
-                || Directory.Exists(_settings.AudioFilePath))
-            {
-                Playlist playlist = new Playlist();
-                playlist.Name = "New";
-                DirectoryInfo directory = new DirectoryInfo(_settings.AudioFilePath);
-                foreach (FileInfo file in directory.GetFiles("*.mp3"))
-                {
-                    Song song = new Song(file.FullName, file.Name);
-                    playlist.Songs.Add(song);
-                }
-
-                CurrentPlaylist = playlist;
-                _manager.OpenPlaylist(playlist);
-            }
+            _manager.BuildPlaylist();
         }
 
         public void PlayPause()
@@ -170,7 +168,6 @@ namespace Bolognese.Desktop.ViewModels
                 case PlayingStatus.Paused:
                     _manager.PlayCurrentTrack();
                     break;
-                case PlayingStatus.Stopped:
                 case PlayingStatus.ReadyToPlay:
                     _manager.PlayNextTrack();
                     break;
@@ -188,13 +185,14 @@ namespace Bolognese.Desktop.ViewModels
         public void Handle(SegmentProgressChanged segmentProgress)
         {
             CurrentSegmentProgress = CalculateSegmentProgress(segmentProgress.TotalTime, segmentProgress.Progress);
+            TimeRemaining = segmentProgress.TotalTime.Subtract(segmentProgress.Progress);
         }
 
         private double CalculateSegmentProgress(TimeSpan totalTime, TimeSpan progress)
         {
             double segmentProgress = (progress.TotalSeconds / totalTime.TotalSeconds) * 100;
 
-            if (CurrentStatus == PlayingStatus.ShortBreak || CurrentStatus == PlayingStatus.LongBreak)
+            if (CurrentStatus == PlayingStatus.Playing)
             {
                 segmentProgress = 100 - segmentProgress; // reverse this so that it counts down instead of up
             }

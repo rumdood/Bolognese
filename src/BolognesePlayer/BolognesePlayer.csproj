@@ -50,6 +50,9 @@
     <Reference Include="MaterialDesignThemes.Wpf, Version=2.3.0.823, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\MaterialDesignThemes.2.3.0.823\lib\net45\MaterialDesignThemes.Wpf.dll</HintPath>
     </Reference>
+    <Reference Include="policy.2.0.taglib-sharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=db62eba44689b5b0, processorArchitecture=MSIL">
+      <HintPath>..\packages\taglib.2.1.0.0\lib\policy.2.0.taglib-sharp.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Data" />
@@ -66,6 +69,9 @@
     <Reference Include="System.Xaml">
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
+    <Reference Include="taglib-sharp, Version=2.1.0.0, Culture=neutral, PublicKeyToken=db62eba44689b5b0, processorArchitecture=MSIL">
+      <HintPath>..\packages\taglib.2.1.0.0\lib\taglib-sharp.dll</HintPath>
+    </Reference>
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -77,6 +83,7 @@
     </ApplicationDefinition>
     <Compile Include="Configuration\BologneseConfigurationSettings.cs" />
     <Compile Include="Configuration\IConfigurationSettings.cs" />
+    <Compile Include="Contracts\ISongFactory.cs" />
     <Compile Include="Contracts\ITrackManager.cs" />
     <Compile Include="Controls\CircularProgressBar.xaml.cs">
       <DependentUpon>CircularProgressBar.xaml</DependentUpon>
@@ -84,7 +91,8 @@
     <Compile Include="Events\PlayerStatusChanged.cs" />
     <Compile Include="Events\SegmentProgressChanged.cs" />
     <Compile Include="Events\ShowPlayerRequested.cs" />
-    <Compile Include="TrackManager.cs" />
+    <Compile Include="PomodoroManager.cs" />
+    <Compile Include="SongFactory.cs" />
     <Compile Include="Tracks\PlayingStatus.cs" />
     <Compile Include="Tracks\Playlist.cs" />
     <Compile Include="Tracks\Song.cs" />

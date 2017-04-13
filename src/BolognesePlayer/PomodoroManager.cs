@@ -4,12 +4,15 @@ using System.Windows.Threading;
 using System.Windows.Media;
 using Caliburn.Micro;
 using Bolognese.Desktop.Tracks;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace Bolognese.Desktop
 {
-    class TrackManager : ITrackManager
+    class PomodoroManager : ITrackManager
     {
         private readonly IEventAggregator _events;
+        private readonly ISongFactory _songFactory;
         private readonly Queue<Song> _songQueue = new Queue<Song>();
         private DispatcherTimer _songTimer;
         private Song _currentSong;
@@ -25,7 +28,7 @@ namespace Bolognese.Desktop
         {
             get
             {
-                return _currentSong.Name;
+                return _currentSong.Title;
             }
         }
 
@@ -41,13 +44,14 @@ namespace Bolognese.Desktop
             }
             else
             {
-                _events.PublishOnUIThread(new PlayerStatusChanged(_status, _currentSong.Name));
+                _events.PublishOnUIThread(new PlayerStatusChanged(_status, _currentSong.Title));
             }
         }
 
-        public TrackManager(IEventAggregator events)
+        public PomodoroManager(IEventAggregator events, ISongFactory songFactory)
         {
             _events = events;
+            _songFactory = songFactory;
 
             _settings = BologneseConfigurationSettings.GetConfigurationSettings();
             _shortBreakDuration = TimeSpan.FromMinutes(_settings.ShortBreakDuration).TotalSeconds;
@@ -197,13 +201,13 @@ namespace Bolognese.Desktop
             _player.Stop();
             //_songTimer.Stop();
 
-            ChangePlayingStatus(PlayingStatus.Stopped);
+            ChangePlayingStatus(PlayingStatus.ReadyToPlay);
         }
 
         void ITrackManager.PlayCurrentTrack()
         {
             if (_currentSong != null && 
-                (_status == PlayingStatus.Paused || _status == PlayingStatus.Stopped))
+                (_status == PlayingStatus.Paused || _status == PlayingStatus.ReadyToPlay))
             {
                 _player.Play();
                 ChangePlayingStatus(PlayingStatus.Playing);
@@ -217,6 +221,43 @@ namespace Bolognese.Desktop
                 _songQueue.Enqueue(s);
             }
             ChangePlayingStatus(PlayingStatus.ReadyToPlay);
+        }
+
+        async Task ITrackManager.BuildPlaylist()
+        {
+            if (_settings.AudioFilePath == string.Empty
+                || !Directory.Exists(_settings.AudioFilePath))
+            {
+                throw new InvalidOperationException("Music Folder Does Not Exist");
+            }
+
+            Playlist current = await GeneratePlaylistFromFolder();
+
+            var trackManager = this as ITrackManager;
+            trackManager.OpenPlaylist(current);
+
+            PlayerStatusChanged status = new PlayerStatusChanged(PlayingStatus.ReadyToPlay);
+            _events.PublishOnUIThread(status);
+        }
+
+        private async Task<Playlist> GeneratePlaylistFromFolder()
+        {
+            var list = await Task.Run(() =>
+            {
+                Playlist playlist = new Playlist();
+                playlist.Name = _settings.AudioFilePath;
+                DirectoryInfo directory = new DirectoryInfo(_settings.AudioFilePath);
+
+                foreach (FileInfo file in directory.GetFiles("*.mp3"))
+                {
+                    Song song = _songFactory.GetSongFromFile(file);
+                    playlist.Songs.Add(song);
+                }
+
+                return playlist;
+            });
+
+            return list;
         }
     }
 }
