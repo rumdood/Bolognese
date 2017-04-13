@@ -185,7 +185,8 @@ namespace Bolognese.Desktop.ViewModels
         public void Handle(SegmentProgressChanged segmentProgress)
         {
             CurrentSegmentProgress = CalculateSegmentProgress(segmentProgress.TotalTime, segmentProgress.Progress);
-            TimeRemaining = segmentProgress.TotalTime.Subtract(segmentProgress.Progress);
+            var remaining = segmentProgress.TotalTime.Subtract(segmentProgress.Progress);
+            TimeRemaining = remaining;
         }
 
         private double CalculateSegmentProgress(TimeSpan totalTime, TimeSpan progress)

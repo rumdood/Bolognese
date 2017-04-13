@@ -87,7 +87,7 @@ namespace Bolognese.Desktop
                         progressTotal = _player.Position;
                         break;
                     case PlayingStatus.ShortBreak:
-                        segmentTotal = TimeSpan.FromMinutes(_shortBreakDuration);
+                        segmentTotal = TimeSpan.FromSeconds(_shortBreakDuration);
                         _currentBreakTime = _currentBreakTime.Add(_songTimer.Interval);
                         progressTotal = _currentBreakTime;
 
@@ -98,7 +98,7 @@ namespace Bolognese.Desktop
 
                         break;
                     case PlayingStatus.LongBreak:
-                        segmentTotal = TimeSpan.FromMinutes(_longBreakDuration);
+                        segmentTotal = TimeSpan.FromSeconds(_longBreakDuration);
                         _currentBreakTime = _currentBreakTime.Add(_songTimer.Interval);
                         progressTotal = _currentBreakTime;
 
