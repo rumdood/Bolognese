@@ -6,10 +6,11 @@ using Caliburn.Micro;
 using Bolognese.Desktop.Tracks;
 using System.IO;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace Bolognese.Desktop
 {
-    class PomodoroManager : ITrackManager
+    class TrackManager : ITrackManager
     {
         private readonly IEventAggregator _events;
         private readonly ISongFactory _songFactory;
@@ -48,7 +49,7 @@ namespace Bolognese.Desktop
             }
         }
 
-        public PomodoroManager(IEventAggregator events, ISongFactory songFactory)
+        public TrackManager(IEventAggregator events, ISongFactory songFactory)
         {
             _events = events;
             _songFactory = songFactory;
@@ -61,7 +62,7 @@ namespace Bolognese.Desktop
             {
                 Interval = TimeSpan.FromMilliseconds(200)
             };
-            _songTimer.Tick += SongTimer_Tick; ;
+            _songTimer.Tick += SongTimer_Tick;
 
             _player = new MediaPlayer();
             _player.MediaFailed += Player_MediaFailed;
@@ -216,9 +217,16 @@ namespace Bolognese.Desktop
 
         void ITrackManager.OpenPlaylist(Playlist playlist)
         {
-            foreach (Song s in playlist.Songs)
+            IEnumerable<Song> songs = playlist.Songs;
+
+            if (_settings.Shuffle)
             {
-                _songQueue.Enqueue(s);
+                songs = playlist.Songs.OrderBy(x => Guid.NewGuid());
+            }
+
+            foreach (Song song in songs)
+            {
+                _songQueue.Enqueue(song);
             }
             ChangePlayingStatus(PlayingStatus.ReadyToPlay);
         }

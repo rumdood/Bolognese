@@ -30,7 +30,7 @@
                           IsChecked="{Binding IsPlaying, Mode=OneWay}">
                 <ToggleButton.Content>
                     <materialDesign:PackIcon Kind="{Binding PlayPauseFrontIcon}" />
-                </ToggleButton.Content> 
+                </ToggleButton.Content>
                 <materialDesign:ToggleButtonAssist.OnContent>
                     <materialDesign:PackIcon Kind="{Binding PlayPauseBackIcon}" />
                 </materialDesign:ToggleButtonAssist.OnContent>
@@ -44,8 +44,13 @@
                                             VerticalAlignment="Center" 
                                             StrokeThickness="10" 
                                             SegmentColor="Green" 
-                                            Percentage="{Binding Path=CurrentSegmentProgress}" />
+                                            Percentage="{Binding CurrentSegmentProgress}" />
         </Grid>
+        <TextBlock Foreground="Gray" 
+                   x:Name="CurrentSongTitle" 
+                   HorizontalAlignment="Center" 
+                   Grid.Column="1" 
+                   Grid.Row="1"/>
         <TextBlock Name="TimeRemaining" 
                    Grid.Row="1" 
                    Grid.Column="2"
@@ -53,8 +58,5 @@
                    HorizontalAlignment="Center"
                    Foreground="Gray"
                    Text="{Binding TimeRemaining,StringFormat=mm\\:ss}"/>
-        <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="1" Grid.Column="1">
-            <TextBlock Foreground="Gray" x:Name="CurrentSongTitle" Width="100" HorizontalAlignment="Center"/>
-        </Grid>
     </Grid>
 </UserControl>
