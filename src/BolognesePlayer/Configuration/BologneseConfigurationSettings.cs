@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Configuration;
+using Bolognese.Common.Configuration;
 
 namespace Bolognese.Desktop
 {
     public class BologneseConfigurationSettings : ConfigurationSection, IConfigurationSettings
     {
-        private static BologneseConfigurationSettings _instance = null;
-
         public static string SectionName
         {
             get { return "UserSettings"; }
@@ -14,6 +13,7 @@ namespace Bolognese.Desktop
 
         private const int DefaultShortDuration = 5;
         private const int DefaultLongDuration = 30;
+        private const int DefaultPomodoroDuration = 25;
         private const int DefaultPomodorosBeforeLongBreak = 4;
 
         [ConfigurationProperty("AudioFilePath", IsRequired = true)]
@@ -87,35 +87,38 @@ namespace Bolognese.Desktop
             set { this["LongBreakDuration"] = value; }
         }
 
+        [ConfigurationProperty("PomodoroDuration", IsRequired = true)]
+        public int PomodoroDuration
+        {
+            get
+            {
+                int pomodoroDuration = (int)this["PomodoroDuration"];
+                if (pomodoroDuration == 0)
+                {
+                    pomodoroDuration = DefaultPomodoroDuration;
+                }
+                return pomodoroDuration;
+            }
+            set
+            {
+                this["PomodoroDuration"] = value;
+            }
+        }
+
+        public BologneseConfigurationSettings()
+        {
+        }
+
         public void Save()
         {
-            CurrentConfiguration.Save(ConfigurationSaveMode.Full, true);
-        }
-
-        private static void InitializeConfigurationSettings()
-        {
-            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoamingAndLocal);
-            BologneseConfigurationSettings userSettings = config.GetSection(SectionName) as BologneseConfigurationSettings;
-
-            if (userSettings == null)
+            if (CurrentConfiguration == null)
             {
-                userSettings = new BologneseConfigurationSettings();
-                userSettings.SectionInformation.AllowExeDefinition = ConfigurationAllowExeDefinition.MachineToLocalUser;
-                config.Sections.Add("UserSettings", userSettings);
-                config.Save(ConfigurationSaveMode.Full, true);
+                throw new InvalidOperationException("No configuration found");
             }
-
-            _instance = userSettings;
-        }
-
-        public static BologneseConfigurationSettings GetConfigurationSettings()
-        {
-            if (_instance == null)
+            else
             {
-                InitializeConfigurationSettings();
+                CurrentConfiguration.Save(ConfigurationSaveMode.Full, true);
             }
-
-            return _instance;
         }
     }
 }

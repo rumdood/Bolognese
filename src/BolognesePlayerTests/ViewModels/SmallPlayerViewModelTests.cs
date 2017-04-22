@@ -1,8 +1,11 @@
 ﻿using Bolognese.Desktop.ViewModels;
+using Bolognese.Common.Media;
+using Bolognese.Common.Pomodoro;
 using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Caliburn.Micro;
+using Bolognese.Common.Configuration;
 
 namespace Bolognese.Desktop.ViewModels.Tests
 {
@@ -11,30 +14,41 @@ namespace Bolognese.Desktop.ViewModels.Tests
     {
         SmallPlayerViewModel _vm;
         Mock<IEventAggregator> _events;
-        Mock<ITrackManager> _manager;
+        Mock<IPomodoroManager> _manager;
+        Mock<IConfigurationSettings> _settings;
 
         [TestInitialize]
         public void Initialize()
         {
             _events = new Mock<IEventAggregator>();
-            _manager = new Mock<ITrackManager>();
+            _manager = new Mock<IPomodoroManager>();
+            _settings = new Mock<IConfigurationSettings>();
 
-            _manager.Setup(mgr => mgr.PlayCurrentTrack())
+            _vm = new SmallPlayerViewModel(_events.Object, _manager.Object, _settings.Object);
+
+            _manager.Setup(mgr => mgr.StartNextSegment())
                 .Callback(() =>
                 {
-                    PlayerStatusChanged newStatus = new PlayerStatusChanged(Tracks.PlayingStatus.Playing);
+                    SegmentProgressChanged newStatus = new SegmentProgressChanged(
+                        new PomodoroSegment()
+                        {
+                            Duration = TimeSpan.FromSeconds(60),
+                            SegmentType = PomodoroSegmentType.Working,
+                            Status = SegmentStatus.Running,
+                            Progress = TimeSpan.FromSeconds(0)
+                        });
                     _vm.Handle(newStatus);
                 }
                 );
 
-            _manager.Setup(mgr => mgr.Pause())
+            _manager.Setup(mgr => mgr.StopSegment())
                 .Callback(() =>
                 {
-                    PlayerStatusChanged newStatus = new PlayerStatusChanged(Tracks.PlayingStatus.Paused);
+                    SegmentStatusChanged newStatus = new SegmentStatusChanged(SegmentStatus.Stopped);
                     _vm.Handle(newStatus);
                 });
 
-            _vm = new SmallPlayerViewModel(_events.Object, _manager.Object);
+            _manager.Object.StartNextSegment();
         }
 
         [TestMethod()]
@@ -43,12 +57,18 @@ namespace Bolognese.Desktop.ViewModels.Tests
             _events.Verify(x => x.Subscribe(_vm));
         }
 
-        private double GetProgressPercentage()
+        private double GetProgressPercentage(PomodoroSegmentType segmentType)
         {
             TimeSpan totalTime = TimeSpan.FromSeconds(60);
             TimeSpan currentPosition = TimeSpan.FromSeconds(18);
 
-            SegmentProgressChanged songProgress = new SegmentProgressChanged(totalTime, currentPosition);
+            SegmentProgressChanged songProgress = new SegmentProgressChanged(new PomodoroSegment()
+            {
+                SegmentType = segmentType,
+                Duration = totalTime,
+                Progress = currentPosition
+            });
+
             _vm.Handle(songProgress);
 
             return _vm.CurrentSegmentProgress;
@@ -58,12 +78,10 @@ namespace Bolognese.Desktop.ViewModels.Tests
         public void SegmentProgressShouldBeNegativeWhilePlaying()
         {
             SubscribeToEvents();
-
-            PlayerStatusChanged status = new PlayerStatusChanged(Tracks.PlayingStatus.Playing);
-            _vm.Handle(status);
+            PomodoroSegmentType type = PomodoroSegmentType.Working;
 
             double targetPercentage = 70;
-            double actualPercentage = GetProgressPercentage();
+            double actualPercentage = GetProgressPercentage(type);
 
             Assert.AreEqual(targetPercentage, actualPercentage, $"Progress percentage should be {targetPercentage}, got {actualPercentage}");
         }
@@ -72,11 +90,10 @@ namespace Bolognese.Desktop.ViewModels.Tests
         public void SegmentProgressShouldBePositiveWhileBreaking()
         {
             SubscribeToEvents();
-            PlayerStatusChanged status = new PlayerStatusChanged(Tracks.PlayingStatus.ShortBreak);
-            _vm.Handle(status);
+            PomodoroSegmentType type = PomodoroSegmentType.ShortBreak;
 
             double targetPercentage = 30;
-            double actualPercentage = GetProgressPercentage();
+            double actualPercentage = GetProgressPercentage(type);
 
             Assert.AreEqual(targetPercentage, actualPercentage, $"Progress percentage should be {targetPercentage}, got {actualPercentage}");
         }
@@ -85,16 +102,16 @@ namespace Bolognese.Desktop.ViewModels.Tests
         public void CurrentStatusShouldChangeToReflectManagerChangedEvents()
         {
             SubscribeToEvents();
-            PlayerStatusChanged status = new PlayerStatusChanged(Tracks.PlayingStatus.Playing);
+            SegmentStatusChanged status = new SegmentStatusChanged(SegmentStatus.Running);
             _vm.Handle(status);
 
-            Assert.AreEqual(Tracks.PlayingStatus.Playing, _vm.CurrentStatus);
+            Assert.AreEqual(SegmentStatus.Running, _vm.CurrentSegment.Status);
             Assert.IsTrue(_vm.IsPlaying);
 
-            status = new PlayerStatusChanged(Tracks.PlayingStatus.ShortBreak);
+            status = new SegmentStatusChanged(SegmentStatus.Stopped);
             _vm.Handle(status);
 
-            Assert.AreEqual(Tracks.PlayingStatus.ShortBreak, _vm.CurrentStatus);
+            Assert.AreEqual(SegmentStatus.Stopped, _vm.CurrentSegment.Status);
             Assert.IsFalse(_vm.IsPlaying);
         }
 
@@ -102,14 +119,14 @@ namespace Bolognese.Desktop.ViewModels.Tests
         public void PlayPauseShouldPlayWhenPaused()
         {
             SubscribeToEvents();
-            PlayerStatusChanged status = new PlayerStatusChanged(Tracks.PlayingStatus.Paused);
+            MediaStatusChanged status = new MediaStatusChanged(PlayingStatus.Paused);
             _vm.Handle(status);
 
-            Assert.AreEqual(Tracks.PlayingStatus.Paused, _vm.CurrentStatus);
+            Assert.AreEqual(SegmentStatus.Stopped, _vm.CurrentSegment.Status);
 
             _vm.PlayPause();
 
-            Assert.AreEqual(Tracks.PlayingStatus.Playing, _vm.CurrentStatus);
+            Assert.AreEqual(SegmentStatus.Running, _vm.CurrentSegment.Status);
         }
 
         [TestMethod()]
@@ -119,7 +136,11 @@ namespace Bolognese.Desktop.ViewModels.Tests
             TimeSpan totalTime = TimeSpan.FromSeconds(60);
             TimeSpan currentPosition = TimeSpan.FromSeconds(18);
 
-            SegmentProgressChanged songProgress = new SegmentProgressChanged(totalTime, currentPosition);
+            SegmentProgressChanged songProgress = new SegmentProgressChanged(new PomodoroSegment()
+            {
+                Duration = totalTime,
+                Progress = currentPosition
+            });
             _vm.Handle(songProgress);
 
             TimeSpan target = TimeSpan.FromSeconds(42);

@@ -1,5 +1,5 @@
-﻿using Caliburn.Micro;
-using System.Configuration;
+﻿using Bolognese.Common.Configuration;
+using Caliburn.Micro;
 
 namespace Bolognese.Desktop.ViewModels
 {
@@ -58,9 +58,9 @@ namespace Bolognese.Desktop.ViewModels
             }
         }
 
-        public ConfigurationViewModel(IEventAggregator events)
+        public ConfigurationViewModel(IEventAggregator events, IConfigurationSettings settings)
         {
-            _settings = BologneseConfigurationSettings.GetConfigurationSettings();
+            _settings = settings;
             _eventBus = events;
         }
 

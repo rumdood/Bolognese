@@ -1,5 +1,6 @@
 ﻿using Caliburn.Micro;
 using Bolognese.Desktop.Contracts;
+using Bolognese.Common.Configuration;
 
 namespace Bolognese.Desktop
 {
@@ -36,9 +37,9 @@ namespace Bolognese.Desktop
             ShowSmallPlayer();
         }
 
-        public ShellViewModel(IEventAggregator events, ITrackManager manager)
+        public ShellViewModel(IEventAggregator events, IConfigurationSettings settings)
         {
-            _settings = BologneseConfigurationSettings.GetConfigurationSettings();
+            _settings = settings;//BologneseConfigurationSettings.GetConfigurationSettings();
             _eventBus = events;
             _eventBus.Subscribe(this);
 

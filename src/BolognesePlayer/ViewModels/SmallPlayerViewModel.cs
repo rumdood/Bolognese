@@ -1,13 +1,14 @@
-﻿using System.IO;
-using System.Windows.Media;
+﻿using System.Windows.Media;
 using Caliburn.Micro;
 using MaterialDesignThemes.Wpf;
-using Bolognese.Desktop.Tracks;
 using System;
+using Bolognese.Common.Media;
+using Bolognese.Common.Configuration;
+using Bolognese.Common.Pomodoro;
 
 namespace Bolognese.Desktop.ViewModels
 {
-    public class SmallPlayerViewModel : Screen, IHandle<PlayerStatusChanged>, IHandle<SegmentProgressChanged>
+    public class SmallPlayerViewModel : Screen, IHandle<MediaStatusChanged>, IHandle<SegmentProgressChanged>, IHandle<SegmentStatusChanged>
     {
         private const PackIconKind PlayIcon = PackIconKind.Play;
         private const PackIconKind PauseIcon = PackIconKind.Pause;
@@ -17,11 +18,10 @@ namespace Bolognese.Desktop.ViewModels
 
         private readonly IEventAggregator _events;
         private readonly IConfigurationSettings _settings;
-        private readonly ITrackManager _manager;
         private Playlist _currentPlaylist;
         private double _currentSegmentProgress = 0;
         private string _currentSongTitle = "";
-        private PlayingStatus _currentStatus = PlayingStatus.Stopped;
+        private PomodoroSegment _currentSegment;
         private Brush _progressBrush = Brushes.Green;
         private PackIconKind _playPauseFront = PlayIcon;
         private PackIconKind _playPauseBack = PauseIcon;
@@ -110,33 +110,39 @@ namespace Bolognese.Desktop.ViewModels
             }
         }
 
-        public PlayingStatus CurrentStatus
+        public PomodoroSegment CurrentSegment
         {
-            get { return _currentStatus; }
+            get { return _currentSegment; }
             private set
             {
-                if (_currentStatus != value)
+                if (_currentSegment != value)
                 {
-                    _currentStatus = value;
-                    NotifyOfPropertyChange(() => CurrentStatus);
+                    _currentSegment = value;
+                    NotifyOfPropertyChange(() => CurrentSegment);
 
-                    if (CurrentStatus == PlayingStatus.Playing)
+                    if (CurrentSegment.SegmentType == PomodoroSegmentType.Working)
                     {
-                        IsPlaying = true;
+                        if (CurrentSegment.Status == SegmentStatus.Running)
+                        {
+                            IsPlaying = true;
+                        }
+                        else
+                        {
+                            IsPlaying = false;
+                        }
                     }
                     else
                     {
                         IsPlaying = false;
                     }
 
-                    switch (CurrentStatus)
+                    switch (CurrentSegment.SegmentType)
                     {
-                        case PlayingStatus.ShortBreak:
-                        case PlayingStatus.LongBreak:
+                        case PomodoroSegmentType.ShortBreak:
+                        case PomodoroSegmentType.LongBreak:
                             PlayPauseFrontIcon = ShortBreakIcon;
                             break;
-                        case PlayingStatus.ReadyToPlay:
-                        case PlayingStatus.Paused:
+                        case PomodoroSegmentType.Working:
                             PlayPauseFrontIcon = PlayIcon;
                             break;
                         default:
@@ -147,45 +153,51 @@ namespace Bolognese.Desktop.ViewModels
             }
         }
 
-        public SmallPlayerViewModel(IEventAggregator events, ITrackManager manager)
+        public SmallPlayerViewModel(IEventAggregator events, IPomodoroManager manager, IConfigurationSettings settings)
         {
             _events = events;
             _events.Subscribe(this);
 
-            _settings = BologneseConfigurationSettings.GetConfigurationSettings();
-            _manager = manager;
-
-            _manager.BuildPlaylist();
+            _settings = settings;
+            manager.Initialize();
         }
 
         public void PlayPause()
         {
-            switch (CurrentStatus)
+            if (CurrentSegment.SegmentType == PomodoroSegmentType.Working)
             {
-                case PlayingStatus.Playing:
-                    _manager.Pause();
-                    break;
-                case PlayingStatus.Paused:
-                    _manager.PlayCurrentTrack();
-                    break;
-                case PlayingStatus.ReadyToPlay:
-                    _manager.PlayNextTrack();
-                    break;
-                default:
-                    break;
+                SegmentRequest request = new SegmentRequest();
+                switch (CurrentSegment.Status)
+                {
+                    case SegmentStatus.ReadyToStart:
+                        request.Action = SegmentRequestAction.StartNext;
+                        break;
+                    case SegmentStatus.Stopped:
+                        request.Action = SegmentRequestAction.Resume;
+                        break;
+                    case SegmentStatus.Running:
+                        request.Action = SegmentRequestAction.Pause;
+                        break;
+                    default:
+                        throw new InvalidOperationException();
+                }
+                _events.PublishOnUIThread(request);
             }
         }
 
-        public void Handle(PlayerStatusChanged playerStatus)
+        public void Handle(MediaStatusChanged playerStatus)
         {
-            CurrentStatus = playerStatus.CurrentStatus;
-            CurrentSongTitle = playerStatus.CurrentTrackTitle;
+            if (playerStatus.CurrentSong != null)
+            {
+                CurrentSongTitle = playerStatus.CurrentSong.Title;
+            }
         }
 
         public void Handle(SegmentProgressChanged segmentProgress)
         {
-            CurrentSegmentProgress = CalculateSegmentProgress(segmentProgress.TotalTime, segmentProgress.Progress);
-            var remaining = segmentProgress.TotalTime.Subtract(segmentProgress.Progress);
+            CurrentSegment = segmentProgress.Segment;
+            CurrentSegmentProgress = CalculateSegmentProgress(segmentProgress.Segment.Duration, segmentProgress.Segment.Progress);
+            var remaining = segmentProgress.Segment.Duration.Subtract(segmentProgress.Segment.Progress);
             TimeRemaining = remaining;
         }
 
@@ -193,12 +205,17 @@ namespace Bolognese.Desktop.ViewModels
         {
             double segmentProgress = (progress.TotalSeconds / totalTime.TotalSeconds) * 100;
 
-            if (CurrentStatus == PlayingStatus.Playing)
+            if (CurrentSegment.SegmentType == PomodoroSegmentType.Working)
             {
                 segmentProgress = 100 - segmentProgress; // reverse this so that it counts down instead of up
             }
 
             return segmentProgress;
+        }
+
+        public void Handle(SegmentStatusChanged message)
+        {
+            CurrentSegment.Status = message.Status;
         }
     }
 }

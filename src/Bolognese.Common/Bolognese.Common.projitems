@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>46da8fec-37d4-4fb5-b004-aaa5fab889cc</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>Bolognese.Common</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Configuration\IConfigurationSettings.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Media\Events\BuildPlaylistFromFolderRequested.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Media\Events\MediaRequestType.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Media\Events\MediaStatusChanged.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Media\Events\MediaRequest.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Media\Events\MediaProgress.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Media\IMediaManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Media\ISongFactory.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Media\PlayingStatus.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Media\Playlist.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Media\Song.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Pomodoro\Events\SegmentRequestAction.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Pomodoro\Events\SegmentProgressChanged.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Pomodoro\Events\SegmentRequest.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Pomodoro\Events\SegmentStatusChanged.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Pomodoro\IPomodoroManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Pomodoro\IPomodoroSegmentFactory.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Pomodoro\PomodoroManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Pomodoro\PomodoroSegement.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Pomodoro\PomodoroSegmentFactory.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Pomodoro\PomodoroSegmentType.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Pomodoro\SegmentStatus.cs" />
+  </ItemGroup>
+</Project>

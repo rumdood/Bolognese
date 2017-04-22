@@ -1,4 +1,4 @@
-﻿namespace Bolognese.Desktop
+﻿namespace Bolognese.Common.Configuration
 {
     public interface IConfigurationSettings
     {
@@ -7,6 +7,7 @@
         int LongBreakCount { get; set; }
         int LongBreakDuration { get; set; }
         int ShortBreakDuration { get; set; }
+        int PomodoroDuration { get; set; }
         void Save();
     }
 }

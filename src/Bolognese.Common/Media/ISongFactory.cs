@@ -1,7 +1,7 @@
-﻿using Bolognese.Desktop.Tracks;
+﻿using System;
 using System.IO;
 
-namespace Bolognese.Desktop
+namespace Bolognese.Common.Media
 {
     public interface ISongFactory
     {

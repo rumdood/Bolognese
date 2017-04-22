@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
-namespace Bolognese.Desktop.Tracks
+namespace Bolognese.Common.Media
 {
     public class Playlist
     {

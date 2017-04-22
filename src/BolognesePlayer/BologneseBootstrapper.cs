@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using Caliburn.Micro;
 using Bolognese.Desktop.Contracts;
-using System.Configuration;
 using Bolognese.Desktop.ViewModels;
+using Bolognese.Common.Media;
+using Bolognese.Common.Pomodoro;
+using Bolognese.Common.Configuration;
+using Bolognese.Desktop.Configuration;
 
 namespace Bolognese.Desktop
 {
@@ -39,7 +39,12 @@ namespace Bolognese.Desktop
         {
             _container.Singleton<IEventAggregator, EventAggregator>();
             _container.Singleton<IWindowManager, WindowManager>();
-            _container.Singleton<ITrackManager, TrackManager>();
+
+            _container.Handler<IConfigurationSettings>(_container => ConfigurationHelper.GetConfiguration());
+
+            _container.Singleton<IPomodoroManager, PomodoroManager>();
+            _container.Singleton<IPomodoroSegmentFactory, PomodoroSegmentFactory>();
+            _container.Singleton<IMediaManager, TrackManager>();
             _container.Singleton<ISongFactory, SongFactory>();
             _container.PerRequest<IShell, ShellViewModel>();
 
@@ -49,6 +54,8 @@ namespace Bolognese.Desktop
 
         protected override void OnStartup(object sender, StartupEventArgs e)
         {
+            _container.GetInstance<IPomodoroManager>();
+            _container.GetInstance<IMediaManager>();
             DisplayRootViewFor<IShell>();
         }
     }
