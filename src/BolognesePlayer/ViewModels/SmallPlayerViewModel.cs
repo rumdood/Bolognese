@@ -119,22 +119,7 @@ namespace Bolognese.Desktop.ViewModels
                 {
                     _currentSegment = value;
                     NotifyOfPropertyChange(() => CurrentSegment);
-
-                    if (CurrentSegment.SegmentType == PomodoroSegmentType.Working)
-                    {
-                        if (CurrentSegment.Status == SegmentStatus.Running)
-                        {
-                            IsPlaying = true;
-                        }
-                        else
-                        {
-                            IsPlaying = false;
-                        }
-                    }
-                    else
-                    {
-                        IsPlaying = false;
-                    }
+                    SetPlayingStatus();
 
                     switch (CurrentSegment.SegmentType)
                     {
@@ -150,6 +135,25 @@ namespace Bolognese.Desktop.ViewModels
                             break;
                     }
                 }
+            }
+        }
+
+        private void SetPlayingStatus()
+        {
+            if (CurrentSegment.SegmentType == PomodoroSegmentType.Working)
+            {
+                if (CurrentSegment.Status == SegmentStatus.Running)
+                {
+                    IsPlaying = true;
+                }
+                else
+                {
+                    IsPlaying = false;
+                }
+            }
+            else
+            {
+                IsPlaying = false;
             }
         }
 
@@ -216,6 +220,7 @@ namespace Bolognese.Desktop.ViewModels
         public void Handle(SegmentStatusChanged message)
         {
             CurrentSegment.Status = message.Status;
+            SetPlayingStatus();
         }
     }
 }

@@ -119,14 +119,14 @@ namespace Bolognese.Desktop.ViewModels.Tests
         public void PlayPauseShouldPlayWhenPaused()
         {
             SubscribeToEvents();
-            MediaStatusChanged status = new MediaStatusChanged(PlayingStatus.Paused);
+            SegmentStatusChanged status = new SegmentStatusChanged(SegmentStatus.Stopped);
             _vm.Handle(status);
 
             Assert.AreEqual(SegmentStatus.Stopped, _vm.CurrentSegment.Status);
 
             _vm.PlayPause();
-
-            Assert.AreEqual(SegmentStatus.Running, _vm.CurrentSegment.Status);
+            _events
+                .Verify(x => x.Publish(It.Is<SegmentRequest>(_ => _.Action == SegmentRequestAction.Resume), Execute.OnUIThread), Times.Once);
         }
 
         [TestMethod()]

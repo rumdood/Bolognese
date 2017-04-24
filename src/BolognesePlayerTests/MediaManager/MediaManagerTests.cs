@@ -36,7 +36,6 @@ namespace BolognesePlayerTests.MediaManager
         {
             _theSong = new Song(@"c:\foo\", "Foo", TimeSpan.FromSeconds(60));
             _events = new Mock<IEventAggregator>();
-            //_events.Setup(x => x.PublishOnBackgroundThread(It.IsAny<MediaStatusChanged>()));
 
             _factory = new Mock<ISongFactory>();
             _factory.Setup(factory => factory.GetSongFromFile(It.IsAny<FileInfo>())).Returns(_theSong);
@@ -49,7 +48,7 @@ namespace BolognesePlayerTests.MediaManager
             _settings.Object.PomodoroDuration = 1;
             _settings.Object.Shuffle = false;
 
-            _manager = new TrackManager(_events.Object, _factory.Object);
+            _manager = new TrackManager(_events.Object, _settings.Object, _factory.Object);
         }
 
         [TestMethod()]
@@ -59,11 +58,11 @@ namespace BolognesePlayerTests.MediaManager
         }
 
         [TestMethod]
-        public void BuildPlaylistShouldReturnSuccessfullyWithRealFiles()
+        public async void BuildPlaylistShouldReturnSuccessfullyWithRealFiles()
         {
             SubscribeToEvents();
             BuildPlaylistFromFolderRequested request = new BuildPlaylistFromFolderRequested(_settings.Object.AudioFilePath, true);
-            _manager.Handle(request);
+            await _manager.Handle(request);
 
             IMediaManager mgr = _manager as IMediaManager;
             int target = 8;
