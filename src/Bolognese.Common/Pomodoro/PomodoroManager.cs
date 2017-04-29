@@ -1,10 +1,9 @@
 ﻿using Bolognese.Common.Configuration;
 using Bolognese.Common.Media;
-using System;
-using System.Timers;
 using Caliburn.Micro;
+using System;
 using System.Diagnostics;
-using System.Threading.Tasks;
+using System.Timers;
 
 namespace Bolognese.Common.Pomodoro
 {
@@ -53,7 +52,7 @@ namespace Bolognese.Common.Pomodoro
 
             BroadcastSegmentStatus(SegmentStatus.Complete);
 
-            manager.StartNextSegment();
+            manager.GetNextSegement();
         }
 
         private void BroadcastSegmentProgress()
@@ -65,7 +64,6 @@ namespace Bolognese.Common.Pomodoro
         private void BroadcastSegmentStatus(SegmentStatus status)
         {
             SegmentStatusChanged statusUpdate = new SegmentStatusChanged(status);
-
             _events.PublishOnUIThread(statusUpdate);
         }
 
@@ -81,7 +79,7 @@ namespace Bolognese.Common.Pomodoro
             BroadcastSegmentStatus(SegmentStatus.Stopped);
         }
 
-        private void StartCurrentSegment()
+        public void StartSegment()
         {
             _segmentTimer.Start();
             
@@ -107,24 +105,23 @@ namespace Bolognese.Common.Pomodoro
         {
             StopCurrentSegment();
             _currentSegment.Progress = new TimeSpan();
-            StartCurrentSegment();
+            BroadcastSegmentProgress();
+            if (_currentSegment.SegmentType == PomodoroSegmentType.Working)
+            {
+                RequestMediaChange(MediaRequestType.Restart);
+            }
+            StartSegment();
         }
 
         public void ResumeSegment()
         {
-            StartCurrentSegment();
+            StartSegment();
         }
 
-        public void StartNextSegment()
+        public void GetNextSegement()
         {
             _currentSegment = _factory.GetNextSegment(_currentSong);
             BroadcastSegmentProgress();
-
-            if (_currentSegment.SegmentType != PomodoroSegmentType.Working)
-            {
-                // working segments should wait for the user to request their start
-                StartCurrentSegment();
-            }
         }
 
         public void Handle(MediaStatusChanged message)
@@ -136,13 +133,13 @@ namespace Bolognese.Common.Pomodoro
 
                     if (_currentSegment == null)
                     {
-                        StartNextSegment();
+                        GetNextSegement();
                     }
                     break;
                 case PlayingStatus.Playing:
                     if (!_segmentTimer.Enabled)
                     {
-                        StartCurrentSegment();
+                        StartSegment();
                     }
                     break;
                 case PlayingStatus.Paused:
@@ -170,11 +167,11 @@ namespace Bolognese.Common.Pomodoro
                 case SegmentRequestAction.StartNext:
                     if (_currentSegment.Progress.TotalSeconds == 0)
                     {
-                        StartCurrentSegment();
+                        StartSegment();
                     }
                     else
                     {
-                        StartNextSegment();
+                        GetNextSegement();
                     }
                     break;
                 case SegmentRequestAction.Pause:
@@ -186,6 +183,8 @@ namespace Bolognese.Common.Pomodoro
                 case SegmentRequestAction.Resume:
                     ResumeSegment();
                     break;
+                default:
+                    throw new InvalidOperationException($"Unknown SegmentRequest Action: {message.Action}");
             }
         }
 

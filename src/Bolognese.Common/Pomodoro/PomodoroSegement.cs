@@ -32,5 +32,18 @@ namespace Bolognese.Common.Pomodoro
                 _status = value;
             }
         }
+
+        public override bool Equals(object obj)
+        {
+            bool areEqual = false;
+            PomodoroSegment other = obj as PomodoroSegment;
+
+            if (other != null)
+            {
+                areEqual = (Duration == other.Duration && SegmentType == other.SegmentType);
+            }
+
+            return areEqual;
+        }
     }
 }

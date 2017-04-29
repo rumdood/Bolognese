@@ -56,6 +56,7 @@
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Caliburn.Micro.3.0.3\lib\net45\System.Windows.Interactivity.dll</HintPath>
       <Private>True</Private>
@@ -156,6 +157,12 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Media\Events\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\tomato_icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\fat_tomato.png" />
   </ItemGroup>
   <Import Project="..\Bolognese.Common\Bolognese.Common.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

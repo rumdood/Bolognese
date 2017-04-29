@@ -16,6 +16,9 @@ namespace Bolognese.Desktop.ViewModels
         private const PackIconKind LongBreakIcon = PackIconKind.Alarm;
         private const PackIconKind ErrorIcon = PackIconKind.Alert;
 
+        private const string ShortBreakText = "Short Break";
+        private const string LongBreakText = "Long Break";
+
         private readonly IEventAggregator _events;
         private readonly IConfigurationSettings _settings;
         private Playlist _currentPlaylist;
@@ -25,19 +28,48 @@ namespace Bolognese.Desktop.ViewModels
         private Brush _progressBrush = Brushes.Green;
         private PackIconKind _playPauseFront = PlayIcon;
         private PackIconKind _playPauseBack = PauseIcon;
-        private bool _isPlaying = false;
+        private bool _isRunning = false;
         private TimeSpan _timeRemaining = TimeSpan.FromSeconds(0);
+        private int _pomodoroCount = 0;
 
-        public bool IsPlaying
+        public int PomodoroCount
         {
             get
             {
-                return _isPlaying;
+                return _pomodoroCount;
             }
             set
             {
-                _isPlaying = value;
-                NotifyOfPropertyChange(() => IsPlaying);
+                _pomodoroCount = value;
+                NotifyOfPropertyChange(() => PomodoroCount);
+            }
+        }
+
+        public bool IsRunning
+        {
+            get
+            {
+                return _isRunning;
+            }
+            set
+            {
+                _isRunning = value;
+                NotifyOfPropertyChange(() => IsRunning);
+                NotifyOfPropertyChange(() => CanRestart);
+
+                var foo = CanRestart;
+            }
+        }
+
+        public bool CanRestart
+        {
+            get
+            {
+                bool playing = !IsRunning;
+                bool canPlay = CanPlayPause;
+                bool someProgress = CurrentSegmentProgress < 100 && CurrentSegmentProgress > 0;
+
+                return playing && canPlay && someProgress;
             }
         }
 
@@ -92,7 +124,31 @@ namespace Bolognese.Desktop.ViewModels
 
         public string CurrentSongTitle
         {
-            get { return _currentSongTitle; }
+            get
+            {
+                string title = string.Empty;
+
+                if (CurrentSegment != null)
+                {
+                    switch (CurrentSegment.SegmentType)
+                    {
+                        case PomodoroSegmentType.Working:
+                            title = _currentSongTitle;
+                            break;
+                        case PomodoroSegmentType.ShortBreak:
+                            title = ShortBreakText;
+                            break;
+                        case PomodoroSegmentType.LongBreak:
+                            title = LongBreakText;
+                            break;
+                        default:
+                            title = string.Empty;
+                            break;
+                    }
+                }
+
+                return title;
+            }
             set
             {
                 _currentSongTitle = value;
@@ -107,6 +163,23 @@ namespace Bolognese.Desktop.ViewModels
             {
                 _currentSegmentProgress = value;
                 NotifyOfPropertyChange(() => CurrentSegmentProgress);
+                NotifyOfPropertyChange(() => CanRestart);
+            }
+        }
+
+        public bool CanPlayPause
+        {
+            get
+            {
+                if (_currentSegment != null 
+                    && (_currentSegment.SegmentType == PomodoroSegmentType.Working
+                    || (_currentSegment.SegmentType != PomodoroSegmentType.Working 
+                        && _currentSegment.Status == SegmentStatus.ReadyToStart)))
+                {
+                    return true;
+                }
+
+                return false;
             }
         }
 
@@ -117,18 +190,28 @@ namespace Bolognese.Desktop.ViewModels
             {
                 if (_currentSegment != value)
                 {
+                    if (_currentSegment != null && _currentSegment.SegmentType == PomodoroSegmentType.Working)
+                    {
+                        PomodoroCount += 1;
+                    }
+
                     _currentSegment = value;
+                    NotifyOfPropertyChange(() => CurrentSongTitle);
                     NotifyOfPropertyChange(() => CurrentSegment);
-                    SetPlayingStatus();
+                    NotifyOfPropertyChange(() => CanPlayPause);
+                    SetRunningStatus();
+
+                    PlayPauseFrontIcon = PlayIcon;
 
                     switch (CurrentSegment.SegmentType)
                     {
                         case PomodoroSegmentType.ShortBreak:
                         case PomodoroSegmentType.LongBreak:
-                            PlayPauseFrontIcon = ShortBreakIcon;
+                            PlayPauseBackIcon = ShortBreakIcon;
+
                             break;
                         case PomodoroSegmentType.Working:
-                            PlayPauseFrontIcon = PlayIcon;
+                            PlayPauseBackIcon = PauseIcon;
                             break;
                         default:
                             PlayPauseFrontIcon = ErrorIcon;
@@ -138,22 +221,20 @@ namespace Bolognese.Desktop.ViewModels
             }
         }
 
-        private void SetPlayingStatus()
+        private void SetRunningStatus()
         {
-            if (CurrentSegment.SegmentType == PomodoroSegmentType.Working)
+            if (CurrentSegment.Status == SegmentStatus.Running)
             {
-                if (CurrentSegment.Status == SegmentStatus.Running)
+                IsRunning = true;
+
+                if (CurrentSegment.SegmentType != PomodoroSegmentType.Working)
                 {
-                    IsPlaying = true;
-                }
-                else
-                {
-                    IsPlaying = false;
+                    PlayPauseFrontIcon = ShortBreakIcon;
                 }
             }
             else
             {
-                IsPlaying = false;
+                IsRunning = false;
             }
         }
 
@@ -168,23 +249,51 @@ namespace Bolognese.Desktop.ViewModels
 
         public void PlayPause()
         {
+            SegmentRequest request = new SegmentRequest();
+            switch (CurrentSegment.Status)
+            {
+                case SegmentStatus.ReadyToStart:
+                    request.Action = SegmentRequestAction.StartNext;
+                    break;
+                case SegmentStatus.Stopped:
+                    request.Action = SegmentRequestAction.Resume;
+                    break;
+                case SegmentStatus.Running:
+                    request.Action = SegmentRequestAction.Pause;
+                    break;
+                default:
+                    throw new InvalidOperationException();
+            }
+
+            if (request.Action == SegmentRequestAction.StartNext 
+                || CurrentSegment.SegmentType == PomodoroSegmentType.Working)
+            {
+                _events.PublishOnUIThread(request);
+            }
+        }
+
+        public void RestartSegment()
+        {
             if (CurrentSegment.SegmentType == PomodoroSegmentType.Working)
             {
-                SegmentRequest request = new SegmentRequest();
-                switch (CurrentSegment.Status)
+                SegmentRequest request = new SegmentRequest()
                 {
-                    case SegmentStatus.ReadyToStart:
-                        request.Action = SegmentRequestAction.StartNext;
-                        break;
-                    case SegmentStatus.Stopped:
-                        request.Action = SegmentRequestAction.Resume;
-                        break;
-                    case SegmentStatus.Running:
-                        request.Action = SegmentRequestAction.Pause;
-                        break;
-                    default:
-                        throw new InvalidOperationException();
-                }
+                    Action = SegmentRequestAction.Restart
+                };
+
+                _events.PublishOnUIThread(request);
+            }
+        }
+
+        public void NextWorkingSegment()
+        {
+            if (CurrentSegment.SegmentType == PomodoroSegmentType.Working)
+            {
+                SegmentRequest request = new SegmentRequest()
+                {
+                    Action = SegmentRequestAction.StartNextWorkSegment
+                };
+
                 _events.PublishOnUIThread(request);
             }
         }
@@ -220,7 +329,7 @@ namespace Bolognese.Desktop.ViewModels
         public void Handle(SegmentStatusChanged message)
         {
             CurrentSegment.Status = message.Status;
-            SetPlayingStatus();
+            SetRunningStatus();
         }
     }
 }

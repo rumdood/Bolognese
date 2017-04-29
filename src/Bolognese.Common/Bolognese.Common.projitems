@@ -32,4 +32,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Pomodoro\PomodoroSegmentType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Pomodoro\SegmentStatus.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)Events\" />
+  </ItemGroup>
 </Project>

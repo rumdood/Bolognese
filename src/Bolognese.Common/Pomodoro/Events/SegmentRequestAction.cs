@@ -3,6 +3,7 @@
     public enum SegmentRequestAction
     {
         StartNext,
+        StartNextWorkSegment,
         Pause,
         Resume,
         Restart

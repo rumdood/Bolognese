@@ -1,14 +1,11 @@
-﻿using System;
-using System.Text;
-using System.Collections.Generic;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
-using Bolognese.Common.Configuration;
+﻿using Bolognese.Common.Configuration;
+using Bolognese.Common.Media;
 using Bolognese.Desktop;
 using Caliburn.Micro;
-using Bolognese.Common.Media;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
+using System;
 using System.IO;
-using System.Threading.Tasks;
 
 namespace BolognesePlayerTests.MediaManager
 {

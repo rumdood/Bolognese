@@ -7,7 +7,8 @@ namespace Bolognese.Common.Pomodoro
     public interface IPomodoroManager
     {
         void Initialize();
-        void StartNextSegment();
+        void GetNextSegement();
+        void StartSegment();
         void StopSegment();
         void ResumeSegment();
         void RestartSegment();
