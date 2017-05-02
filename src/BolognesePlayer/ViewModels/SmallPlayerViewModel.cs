@@ -5,6 +5,7 @@ using System;
 using Bolognese.Common.Media;
 using Bolognese.Common.Configuration;
 using Bolognese.Common.Pomodoro;
+using System.Media;
 
 namespace Bolognese.Desktop.ViewModels
 {

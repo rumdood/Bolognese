@@ -84,7 +84,7 @@ namespace Bolognese.Desktop
 
         private void Player_MediaOpened(object sender, EventArgs e)
         {
-            //_player.Position = _player.NaturalDuration.TimeSpan.Subtract(TimeSpan.FromSeconds(5));
+            _player.Position = _player.NaturalDuration.TimeSpan.Subtract(TimeSpan.FromSeconds(15));
             ChangePlayingStatus(PlayingStatus.ReadyToPlay);
         }
 

@@ -48,6 +48,7 @@ namespace Bolognese.Desktop
             _container.Singleton<ISongFactory, SongFactory>();
             _container.PerRequest<IShell, ShellViewModel>();
 
+            _container.Singleton<Alerter>();
             _container.Singleton<Screen, SmallPlayerViewModel>("player");
             _container.PerRequest<Screen, ConfigurationViewModel>("config");
         }
@@ -56,6 +57,7 @@ namespace Bolognese.Desktop
         {
             _container.GetInstance<IPomodoroManager>();
             _container.GetInstance<IMediaManager>();
+            _container.GetInstance<Alerter>();
             DisplayRootViewFor<IShell>();
         }
     }

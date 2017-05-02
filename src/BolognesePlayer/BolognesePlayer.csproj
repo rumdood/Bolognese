@@ -88,6 +88,7 @@
       <DependentUpon>CircularProgressBar.xaml</DependentUpon>
     </Compile>
     <Compile Include="Events\ShowPlayerRequested.cs" />
+    <Compile Include="Alerts\Alerter.cs" />
     <Compile Include="Media\SongFactory.cs" />
     <Compile Include="Media\TrackManager.cs" />
     <Compile Include="ViewModels\SmallPlayerViewModel.cs" />
@@ -159,10 +160,7 @@
     <Folder Include="Media\Events\" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\tomato_icon.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\fat_tomato.png" />
+    <None Include="Resources\Settle In.wav" />
   </ItemGroup>
   <Import Project="..\Bolognese.Common\Bolognese.Common.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
