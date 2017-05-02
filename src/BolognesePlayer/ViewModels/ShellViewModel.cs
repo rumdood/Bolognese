@@ -39,7 +39,7 @@ namespace Bolognese.Desktop
 
         public ShellViewModel(IEventAggregator events, IConfigurationSettings settings)
         {
-            _settings = settings;//BologneseConfigurationSettings.GetConfigurationSettings();
+            _settings = settings;
             _eventBus = events;
             _eventBus.Subscribe(this);
 

@@ -4,7 +4,9 @@ namespace Bolognese.Desktop.Configuration
 {
     public static class ConfigurationHelper
     {
-        public static BologneseConfigurationSettings GetConfiguration()
+        static BologneseConfigurationSettings _settings = null;
+
+        static BologneseConfigurationSettings LoadConfiguration()
         {
             System.Configuration.Configuration configuration = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoamingAndLocal);
             var bologneseConfiguration = configuration.GetSection(BologneseConfigurationSettings.SectionName) as BologneseConfigurationSettings;
@@ -18,6 +20,16 @@ namespace Bolognese.Desktop.Configuration
             }
 
             return bologneseConfiguration;
+        }
+
+        public static BologneseConfigurationSettings GetConfiguration()
+        {
+            if (_settings == null)
+            {
+                _settings = LoadConfiguration();
+            }
+
+            return _settings;
         }
     }
 }
