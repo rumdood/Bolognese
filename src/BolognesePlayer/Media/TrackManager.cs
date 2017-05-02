@@ -84,7 +84,6 @@ namespace Bolognese.Desktop
 
         private void Player_MediaOpened(object sender, EventArgs e)
         {
-            _player.Position = _player.NaturalDuration.TimeSpan.Subtract(TimeSpan.FromSeconds(15));
             ChangePlayingStatus(PlayingStatus.ReadyToPlay);
         }
 
@@ -133,7 +132,6 @@ namespace Bolognese.Desktop
             if (_currentSong != null && 
                 (_status == PlayingStatus.Paused || _status == PlayingStatus.ReadyToPlay))
             {
-                //_player.Position = _player.NaturalDuration.TimeSpan.Subtract(TimeSpan.FromSeconds(5));
                 _player.Play();
                 ChangePlayingStatus(PlayingStatus.Playing);
             }
