@@ -74,5 +74,27 @@ namespace Bolognese.Desktop.ViewModels
         {
             _eventBus.PublishOnUIThread(new ShowPlayerRequested());
         }
+
+        public void OpenFilePicker()
+        {
+            System.Windows.Forms.FolderBrowserDialog folderDialog = new System.Windows.Forms.FolderBrowserDialog();
+
+            folderDialog.RootFolder = System.Environment.SpecialFolder.Desktop;
+            
+            if (!string.IsNullOrEmpty(AudioFilePath))
+            {
+                folderDialog.SelectedPath = AudioFilePath;
+            }
+
+            folderDialog.ShowNewFolderButton = false;
+
+            System.Windows.Forms.DialogResult result = folderDialog.ShowDialog();
+            
+            if (result == System.Windows.Forms.DialogResult.OK)
+            {
+                string newPath = folderDialog.SelectedPath;
+                AudioFilePath = newPath;
+            }
+        }
     }
 }

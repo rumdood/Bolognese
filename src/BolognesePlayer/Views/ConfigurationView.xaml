@@ -12,12 +12,17 @@
              FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="600">
+    <UserControl.Resources>
+    </UserControl.Resources>
     <StackPanel>
         <GroupBox Header="Audio Settings">
             <StackPanel>
                 <DockPanel>
                     <Label Content="Play From" Width="75" />
-                    <TextBox x:Name="AudioFilePath" TextWrapping="Wrap" IsEnabled="True" HorizontalAlignment="Left" Width="300"/>
+                    <TextBlock x:Name="AudioFilePath" HorizontalAlignment="Left" VerticalAlignment="Center" Width="200" TextTrimming="CharacterEllipsis"/>
+                    <Button x:Name="OpenFilePicker" Style="{DynamicResource MaterialDesignFloatingActionMiniButton}" Width="25" Height="25">
+                        <materialDesign:PackIcon Kind="Folder"></materialDesign:PackIcon>
+                    </Button>
                 </DockPanel>
                 <DockPanel Margin="0,5,0,0">
                     <Label Content="Shuffle" Width="75" />
