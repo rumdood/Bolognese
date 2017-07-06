@@ -1,22 +1,13 @@
-﻿using System.Windows.Media;
-using Caliburn.Micro;
-using MaterialDesignThemes.Wpf;
+﻿using Caliburn.Micro;
 using System;
 using Bolognese.Common.Media;
 using Bolognese.Common.Configuration;
 using Bolognese.Common.Pomodoro;
-using System.Media;
 
 namespace Bolognese.Desktop.ViewModels
 {
     public class SmallPlayerViewModel : Screen, IHandle<MediaStatusChanged>, IHandle<SegmentProgressChanged>, IHandle<SegmentStatusChanged>
     {
-        private const PackIconKind PlayIcon = PackIconKind.Play;
-        private const PackIconKind PauseIcon = PackIconKind.Pause;
-        private const PackIconKind ShortBreakIcon = PackIconKind.Alarm;
-        private const PackIconKind LongBreakIcon = PackIconKind.Alarm;
-        private const PackIconKind ErrorIcon = PackIconKind.Alert;
-
         private const string ShortBreakText = "Short Break";
         private const string LongBreakText = "Long Break";
 
@@ -26,9 +17,6 @@ namespace Bolognese.Desktop.ViewModels
         private double _currentSegmentProgress = 0;
         private string _currentSongTitle = "";
         private PomodoroSegment _currentSegment;
-        private Brush _progressBrush = Brushes.Green;
-        private PackIconKind _playPauseFront = PlayIcon;
-        private PackIconKind _playPauseBack = PauseIcon;
         private bool _isRunning = false;
         private TimeSpan _timeRemaining = TimeSpan.FromSeconds(0);
         private int _pomodoroCount = 0;
@@ -57,8 +45,6 @@ namespace Bolognese.Desktop.ViewModels
                 _isRunning = value;
                 NotifyOfPropertyChange(() => IsRunning);
                 NotifyOfPropertyChange(() => CanRestart);
-
-                var foo = CanRestart;
             }
         }
 
@@ -84,32 +70,6 @@ namespace Bolognese.Desktop.ViewModels
             {
                 _timeRemaining = value;
                 NotifyOfPropertyChange(() => TimeRemaining);
-            }
-        }
-
-        public PackIconKind PlayPauseFrontIcon
-        {
-            get
-            {
-                return _playPauseFront;
-            }
-            set
-            {
-                _playPauseFront = value;
-                NotifyOfPropertyChange(() => PlayPauseFrontIcon);
-            }
-        }
-
-        public PackIconKind PlayPauseBackIcon
-        {
-            get
-            {
-                return _playPauseBack;
-            }
-            set
-            {
-                _playPauseBack = value;
-                NotifyOfPropertyChange(() => PlayPauseBackIcon);
             }
         }
 
@@ -168,6 +128,19 @@ namespace Bolognese.Desktop.ViewModels
             }
         }
 
+        public PomodoroSegmentType CurrentSegmentType
+        {
+            get
+            {
+                if (CurrentSegment == null)
+                {
+                    return PomodoroSegmentType.LongBreak;
+                }
+
+                return CurrentSegment.SegmentType;
+            }
+        }
+
         public bool CanPlayPause
         {
             get
@@ -199,25 +172,9 @@ namespace Bolognese.Desktop.ViewModels
                     _currentSegment = value;
                     NotifyOfPropertyChange(() => CurrentSongTitle);
                     NotifyOfPropertyChange(() => CurrentSegment);
+                    NotifyOfPropertyChange(() => CurrentSegmentType);
                     NotifyOfPropertyChange(() => CanPlayPause);
                     SetRunningStatus();
-
-                    PlayPauseFrontIcon = PlayIcon;
-
-                    switch (CurrentSegment.SegmentType)
-                    {
-                        case PomodoroSegmentType.ShortBreak:
-                        case PomodoroSegmentType.LongBreak:
-                            PlayPauseBackIcon = ShortBreakIcon;
-
-                            break;
-                        case PomodoroSegmentType.Working:
-                            PlayPauseBackIcon = PauseIcon;
-                            break;
-                        default:
-                            PlayPauseFrontIcon = ErrorIcon;
-                            break;
-                    }
                 }
             }
         }
@@ -227,11 +184,6 @@ namespace Bolognese.Desktop.ViewModels
             if (CurrentSegment.Status == SegmentStatus.Running)
             {
                 IsRunning = true;
-
-                if (CurrentSegment.SegmentType != PomodoroSegmentType.Working)
-                {
-                    PlayPauseFrontIcon = ShortBreakIcon;
-                }
             }
             else
             {

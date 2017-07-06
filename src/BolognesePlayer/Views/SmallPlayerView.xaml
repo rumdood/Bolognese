@@ -10,6 +10,7 @@
              TextElement.FontSize="14"
              FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto"
              xmlns:local="clr-namespace:Bolognese.Desktop.Views"
+             xmlns:pomodoro="clr-namespace:Bolognese.Common.Pomodoro"
              mc:Ignorable="d" 
              d:DesignHeight="100" d:DesignWidth="200"
              Background="Black">
@@ -19,6 +20,53 @@
             <Style.Triggers>
                 <DataTrigger Binding="{Binding CanRestart}" Value="True">
                     <Setter Property="Visibility" Value="Visible"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="PlayToggle" TargetType="ToggleButton" BasedOn="{StaticResource MaterialDesignActionToggleButton}">
+            <Style.Setters>
+                <Setter Property="Content">
+                    <Setter.Value>
+                        <materialDesign:PackIcon Kind="Alert"/>
+                    </Setter.Value>
+                </Setter>
+            </Style.Setters>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding CurrentSegmentType}" Value="{x:Static pomodoro:PomodoroSegmentType.Working}">
+                    <Setter Property="materialDesign:ToggleButtonAssist.OnContent">
+                        <Setter.Value>
+                            <materialDesign:PackIcon Kind="Pause"/>
+                        </Setter.Value>
+                    </Setter>
+                    <Setter Property="Content">
+                        <Setter.Value>
+                            <materialDesign:PackIcon Kind="Play"/>
+                        </Setter.Value>
+                    </Setter>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding CurrentSegmentType}" Value="{x:Static pomodoro:PomodoroSegmentType.ShortBreak}">
+                    <Setter Property="materialDesign:ToggleButtonAssist.OnContent">
+                        <Setter.Value>
+                            <materialDesign:PackIcon Kind="Coffee"/>
+                        </Setter.Value>
+                    </Setter>
+                    <Setter Property="Content">
+                        <Setter.Value>
+                            <materialDesign:PackIcon Kind="CoffeeToGo"/>
+                        </Setter.Value>
+                    </Setter>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding CurrentSegmentType}" Value="{x:Static pomodoro:PomodoroSegmentType.LongBreak}">
+                    <Setter Property="materialDesign:ToggleButtonAssist.OnContent">
+                        <Setter.Value>
+                            <materialDesign:PackIcon Kind="Walk"/>
+                        </Setter.Value>
+                    </Setter>
+                    <Setter Property="Content">
+                        <Setter.Value>
+                            <materialDesign:PackIcon Kind="Run"/>
+                        </Setter.Value>
+                    </Setter>
                 </DataTrigger>
             </Style.Triggers>
         </Style>
@@ -45,14 +93,8 @@
         <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="0" Grid.Column="1">
             <ToggleButton x:Name="PlayPause" 
                           Margin="5 10 5 10" 
-                          Style="{DynamicResource MaterialDesignActionToggleButton}"
+                          Style="{StaticResource PlayToggle}"
                           IsChecked="{Binding IsRunning, Mode=TwoWay}">
-                <ToggleButton.Content>
-                    <materialDesign:PackIcon Kind="{Binding PlayPauseFrontIcon}" />
-                </ToggleButton.Content>
-                <materialDesign:ToggleButtonAssist.OnContent>
-                    <materialDesign:PackIcon Kind="{Binding PlayPauseBackIcon}" />
-                </materialDesign:ToggleButtonAssist.OnContent>
             </ToggleButton>
             <UIControls:CircularProgressBar HorizontalAlignment="Center" 
                                             VerticalAlignment="Center" 
