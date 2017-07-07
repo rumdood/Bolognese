@@ -9,12 +9,12 @@
              TextElement.Foreground="{DynamicResource MaterialDesignBody}"
              TextElement.FontWeight="Medium"
              TextElement.FontSize="14"
-             Background="Black"
              FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto"
              mc:Ignorable="d" 
              WindowStyle="None"
              Width="200"
              Height="110"
+        Background="{DynamicResource MaterialDesignPaper}"
              >
     <Grid>
         <StackPanel Orientation="Vertical">

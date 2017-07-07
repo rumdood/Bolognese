@@ -13,7 +13,7 @@
              xmlns:pomodoro="clr-namespace:Bolognese.Common.Pomodoro"
              mc:Ignorable="d" 
              d:DesignHeight="100" d:DesignWidth="200"
-             Background="Black">
+             >
     <UserControl.Resources>
         <Style x:Key="HideShowButton" TargetType="StackPanel">
             <Setter Property="Visibility" Value="Hidden"/>
@@ -111,11 +111,11 @@
                     HorizontalAlignment="Center"
                     Grid.Column="0"
                     Grid.Row="1">
-            <TextBlock Foreground="Gray" 
+            <TextBlock
                    x:Name="PomodoroCount" 
                    HorizontalAlignment="Center" />
         </StackPanel>
-        <TextBlock Foreground="Gray" 
+        <TextBlock
                    x:Name="CurrentSongTitle" 
                    VerticalAlignment="Top"
                    HorizontalAlignment="Center" 
@@ -126,7 +126,6 @@
                    Grid.Column="2"
                    VerticalAlignment="Top" 
                    HorizontalAlignment="Center"
-                   Foreground="Gray"
                    Text="{Binding TimeRemaining,StringFormat=mm\\:ss}"/>
     </Grid>
 </UserControl>
