@@ -16,7 +16,7 @@ namespace Bolognese.Desktop
 
         public void CloseWindow()
         {
-            System.Windows.Application.Current.Shutdown();
+            TryClose();
         }
 
         public void ShowConfiguration()

@@ -46,7 +46,8 @@ namespace Bolognese.Desktop
             _container.Singleton<IPomodoroSegmentFactory, PomodoroSegmentFactory>();
             _container.Singleton<IMediaManager, TrackManager>();
             _container.Singleton<ISongFactory, SongFactory>();
-            _container.PerRequest<IShell, ShellViewModel>();
+            _container.PerRequest<IShell, TrayShellViewModel>();
+            _container.Singleton<IConductActiveItem, ShellViewModel>("RealShell");
 
             _container.Singleton<Alerter>();
             _container.Singleton<Screen, SmallPlayerViewModel>("player");

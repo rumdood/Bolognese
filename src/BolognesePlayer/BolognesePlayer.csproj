@@ -44,6 +44,9 @@
     <Reference Include="Caliburn.Micro.Platform.Core, Version=3.0.3.0, Culture=neutral, PublicKeyToken=8e5891231f2ed21f, processorArchitecture=MSIL">
       <HintPath>..\packages\Caliburn.Micro.3.1.0\lib\net45\Caliburn.Micro.Platform.Core.dll</HintPath>
     </Reference>
+    <Reference Include="Hardcodet.Wpf.TaskbarNotification, Version=1.0.5.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Hardcodet.NotifyIcon.Wpf.1.0.8\lib\net451\Hardcodet.Wpf.TaskbarNotification.dll</HintPath>
+    </Reference>
     <Reference Include="MaterialDesignColors, Version=1.1.3.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\MaterialDesignColors.1.1.3\lib\net45\MaterialDesignColors.dll</HintPath>
     </Reference>
@@ -92,6 +95,7 @@
     <Compile Include="Media\SongFactory.cs" />
     <Compile Include="Media\TrackManager.cs" />
     <Compile Include="ViewModels\SmallPlayerViewModel.cs" />
+    <Compile Include="ViewModels\TrayShellViewModel.cs" />
     <Compile Include="Views\ConfigurationView.xaml.cs">
       <DependentUpon>ConfigurationView.xaml</DependentUpon>
     </Compile>
@@ -109,6 +113,9 @@
     <Compile Include="Views\SmallPlayerView.xaml.cs">
       <DependentUpon>SmallPlayerView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\TrayShellView.xaml.cs">
+      <DependentUpon>TrayShellView.xaml</DependentUpon>
+    </Compile>
     <Page Include="Controls\CircularProgressBar.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -122,6 +129,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\SmallPlayerView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\TrayShellView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -161,6 +172,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Settle In.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Tomato.ico" />
   </ItemGroup>
   <Import Project="..\Bolognese.Common\Bolognese.Common.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

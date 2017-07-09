@@ -1,6 +1,6 @@
 ﻿namespace Bolognese.Desktop
 {
-    class ShowPlayerRequested
+    public class ShowPlayerRequested
     {
     }
 }
