@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System.Windows.Media;
 using Caliburn.Micro;
-using System.IO;
 using System.Threading.Tasks;
 using System.Linq;
 using Bolognese.Common.Media;
 using System.Diagnostics;
 using System.Windows.Threading;
 using Bolognese.Common.Configuration;
+using System.IO.Abstractions;
+using System.IO;
 
 namespace Bolognese.Desktop
 {
@@ -17,7 +18,11 @@ namespace Bolognese.Desktop
         private readonly IEventAggregator _events;
         private readonly ISongFactory _songFactory;
         private readonly IConfigurationSettings _configuration;
-        private readonly Queue<Song> _songQueue = new Queue<Song>();
+        private readonly IFileSystem _fileSystem;
+
+        private Queue<Song> _songQueue = new Queue<Song>();
+        private IEnumerable<Song> _playlist;
+        private readonly List<Song> _songHistory = new List<Song>();
         private Song _currentSong;
         private MediaPlayer _player;
         private DispatcherTimer _timer;
@@ -53,10 +58,13 @@ namespace Bolognese.Desktop
             }
         }
 
-        public TrackManager(IEventAggregator events, IConfigurationSettings configuration, ISongFactory songFactory)
+        public TrackManager(IEventAggregator events, IConfigurationSettings configuration, IFileSystem fileSystem, ISongFactory songFactory)
         {
             _events = events;
             _events.Subscribe(this);
+
+            _fileSystem = fileSystem;
+
             _configuration = configuration;
             _songFactory = songFactory;
 
@@ -139,23 +147,18 @@ namespace Bolognese.Desktop
 
         void IMediaManager.OpenPlaylist(Playlist playlist)
         {
-            IEnumerable<Song> songs = playlist.Songs;
+            _playlist = playlist.Songs;
 
             if (_configuration.Shuffle)
             {
-                songs = playlist.Songs.OrderBy(x => Guid.NewGuid());
-            }
-
-            foreach (Song song in songs)
-            {
-                _songQueue.Enqueue(song);
+                _playlist = playlist.Songs.OrderBy(x => Guid.NewGuid());
             }
         }
 
         async Task IMediaManager.BuildPlaylist(string audioFilePath)
         {
             if (string.IsNullOrEmpty(audioFilePath)
-                || !Directory.Exists(audioFilePath))
+                || !_fileSystem.Directory.Exists(audioFilePath))
             {
                 throw new InvalidOperationException("Music Folder Does Not Exist");
             }
@@ -164,7 +167,17 @@ namespace Bolognese.Desktop
 
             var trackManager = this as IMediaManager;
             trackManager.OpenPlaylist(current);
+            BuildQueue();
             trackManager.OpenNextSong();
+        }
+
+        private void BuildQueue()
+        {
+            double totalQueueTime = 0;
+            var unplayed = _playlist.Where(song => !_songHistory.Contains(song));
+
+            var songsToQueue = unplayed.TakeWhile(song => (totalQueueTime += song.Duration.TotalMinutes) <= (_configuration.PomodoroDuration + 1));
+            _songQueue = new Queue<Song>(songsToQueue);
         }
 
         private async Task<Playlist> GeneratePlaylistFromFolder(string audioFilePath)
@@ -173,9 +186,9 @@ namespace Bolognese.Desktop
             {
                 Playlist playlist = new Playlist();
                 playlist.Name = audioFilePath;
-                DirectoryInfo directory = new DirectoryInfo(audioFilePath);
+                var audioFolder = _fileSystem.DirectoryInfo.FromDirectoryName(audioFilePath);
 
-                foreach (FileInfo file in directory.GetFiles("*.mp3"))
+                foreach (var file in audioFolder.GetFiles("*.mp3"))
                 {
                     Song song = _songFactory.GetSongFromFile(file);
                     playlist.Songs.Add(song);
