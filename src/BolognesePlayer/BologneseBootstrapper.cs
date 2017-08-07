@@ -8,7 +8,6 @@ using Bolognese.Common.Media;
 using Bolognese.Common.Pomodoro;
 using Bolognese.Common.Configuration;
 using Bolognese.Desktop.Configuration;
-using System.IO.Abstractions;
 
 namespace Bolognese.Desktop
 {
@@ -49,8 +48,6 @@ namespace Bolognese.Desktop
             _container.Singleton<ISongFactory, SongFactory>();
             _container.PerRequest<IShell, TrayShellViewModel>();
             _container.PerRequest<IConductActiveItem, ShellViewModel>("RealShell");
-
-            _container.Singleton<IFileSystem, FileSystem>();
 
             _container.Singleton<Alerter>();
             _container.Singleton<Screen, SmallPlayerViewModel>("player");

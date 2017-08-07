@@ -1,9 +1,10 @@
-﻿using System.IO.Abstractions;
+﻿using System;
+using System.IO;
 
 namespace Bolognese.Common.Media
 {
     public interface ISongFactory
     {
-        Song GetSongFromFile(FileInfoBase file);
+        Song GetSongFromFile(FileInfo file);
     }
 }

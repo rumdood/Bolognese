@@ -1,13 +1,13 @@
-﻿using TagLib;
+﻿using System.IO;
+using TagLib;
 using Bolognese.Common.Media;
 using System;
-using System.IO.Abstractions;
 
 namespace Bolognese.Desktop
 {
     public class SongFactory : ISongFactory
     {
-        Song ISongFactory.GetSongFromFile(FileInfoBase file)
+        Song ISongFactory.GetSongFromFile(FileInfo file)
         {
             string filePath = file.FullName;
             TagLib.File tagFile = TagLib.File.Create(filePath);
