@@ -45,5 +45,11 @@ namespace Bolognese.Common.Pomodoro
 
             return areEqual;
         }
+
+        public override int GetHashCode()
+        {
+            var time = Convert.ToInt32(Duration.TotalSeconds);
+            return time;
+        }
     }
 }
