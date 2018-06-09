@@ -48,6 +48,78 @@ namespace BolognesePlayerTests.MediaManager
             _manager = new TrackManager(_events.Object, _settings.Object, _factory.Object);
         }
 
+        internal int BuildPlaylist1(int[] lengths)
+        {
+            var target = 25;
+            var fudgeFactor = 1;
+            var currentLength = 0;
+
+            int lowerBound = target - fudgeFactor;
+            int upperBound = target + fudgeFactor;
+            int maxRemainder = upperBound;
+
+            int index = -1;
+
+            while (++index < lengths.Length
+                && maxRemainder >= (upperBound - lowerBound))
+            {
+                if (maxRemainder >= lengths[index])
+                {
+                    currentLength += lengths[index];
+                    maxRemainder = upperBound - currentLength;
+                }
+            }
+
+            return currentLength;
+        }
+
+        internal int BuildPlaylist2(int[] lengths)
+        {
+            var target = 25;
+            var fudgeFactor = 1;
+            var currentLength = 0;
+
+            int lowerBound = target - fudgeFactor;
+            int upperBound = target + fudgeFactor;
+            int maxRemainder = upperBound;
+
+            for (int i = 0; i < lengths.Length; i++)
+            {
+                if (lengths[i] > maxRemainder)
+                {
+                    continue;
+                }
+
+                currentLength += lengths[i];
+                maxRemainder = upperBound - currentLength;
+
+                if (maxRemainder <= (upperBound - lowerBound))
+                {
+                    break;
+                }
+            }
+
+            return currentLength;
+        }
+
+        [TestMethod()]
+        public void BuildPlaylistShouldFillTheBucket()
+        {
+            int[] lengths = { 12, 2, 15, 24, 7, 9, 4, 7 };
+
+            var watch = System.Diagnostics.Stopwatch.StartNew();
+            int result = BuildPlaylist1(lengths);
+            watch.Stop();
+            var e1 = watch.ElapsedTicks;
+
+            watch = System.Diagnostics.Stopwatch.StartNew();
+            int result2 = BuildPlaylist2(lengths);
+            watch.Stop();
+            var e2 = watch.ElapsedTicks;
+
+            Assert.IsTrue(e1 > e2);
+        }
+
         [TestMethod()]
         public void SubscribeToEvents()
         {

@@ -15,10 +15,12 @@
     <Compile Include="$(MSBuildThisFileDirectory)Media\Events\MediaStatusChanged.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Media\Events\MediaRequest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Media\Events\MediaProgress.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Media\IMediaManager.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Media\ISongFactory.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Media\Contracts\IMediaManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Media\Contracts\IPlaylistBuilder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Media\Contracts\ISongFactory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Media\PlayingStatus.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Media\Playlist.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Media\PlaylistBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Media\Song.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Pomodoro\Events\SegmentRequestAction.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Pomodoro\Events\SegmentProgressChanged.cs" />
@@ -34,5 +36,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="$(MSBuildThisFileDirectory)Events\" />
+    <Folder Include="$(MSBuildThisFileDirectory)Media\Contracts\" />
   </ItemGroup>
 </Project>
