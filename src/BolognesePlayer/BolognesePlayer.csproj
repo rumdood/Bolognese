@@ -60,6 +60,9 @@
     <Reference Include="System.configuration" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.IO.Abstractions, Version=2.1.0.178, Culture=neutral, PublicKeyToken=96bf224d23c43e59, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.IO.Abstractions.2.1.0.178\lib\net40\System.IO.Abstractions.dll</HintPath>
+    </Reference>
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Caliburn.Micro.3.2.0\lib\net45\System.Windows.Interactivity.dll</HintPath>
@@ -90,9 +93,10 @@
     <Compile Include="Controls\CircularProgressBar.xaml.cs">
       <DependentUpon>CircularProgressBar.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Events\PlaylistReady.cs" />
     <Compile Include="Events\ShowPlayerRequested.cs" />
     <Compile Include="Alerts\Alerter.cs" />
-    <Compile Include="Media\SongFactory.cs" />
+    <Compile Include="Media\FileSystemSongFactory.cs" />
     <Compile Include="Media\TrackManager.cs" />
     <Compile Include="ViewModels\SmallPlayerViewModel.cs" />
     <Compile Include="ViewModels\TrayShellViewModel.cs" />

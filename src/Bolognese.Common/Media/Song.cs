@@ -4,13 +4,13 @@ namespace Bolognese.Common.Media
 {
     public class Song
     {
-        public string FilePath { get; private set; }
+        public string Path { get; private set; }
         public string Title { get; private set; }
         public TimeSpan Duration { get; private set; }
 
-        public Song(string filePath, string name, TimeSpan duration)
+        public Song(string path, string name, TimeSpan duration)
         {
-            FilePath = filePath;
+            Path = path;
             Title = name;
             Duration = duration;
         }

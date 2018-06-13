@@ -1,18 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Windows.Media;
-using Caliburn.Micro;
-using System.IO;
-using System.Threading.Tasks;
-using System.Linq;
-using Bolognese.Common.Media;
 using System.Diagnostics;
+using System.IO.Abstractions;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Windows.Media;
 using System.Windows.Threading;
+using Caliburn.Micro;
 using Bolognese.Common.Configuration;
+using Bolognese.Common.Media;
+using Bolognese.Desktop.Events;
 
 namespace Bolognese.Desktop
 {
-    public class TrackManager : IMediaManager, IHandleWithTask<BuildPlaylistFromFolderRequested>, IHandle<MediaRequest>
+    public class TrackManager : IMediaManager, 
+                                IHandleWithTask<BuildPlaylistFromFolderRequested>, 
+                                IHandle<MediaRequest>, 
+                                IHandle<PlaylistReady>
     {
         private readonly IEventAggregator _events;
         private readonly ISongFactory _songFactory;
@@ -22,6 +26,8 @@ namespace Bolognese.Desktop
         private MediaPlayer _player;
         private DispatcherTimer _timer;
         private PlayingStatus _status = PlayingStatus.Stopped;
+        private readonly IFileSystem _fileSystem;
+        private readonly IPlaylistBuilder _playlistBuilder;
 
         string IMediaManager.CurrentSongTitle
         {
@@ -53,12 +59,18 @@ namespace Bolognese.Desktop
             }
         }
 
-        public TrackManager(IEventAggregator events, IConfigurationSettings configuration, ISongFactory songFactory)
+        public TrackManager(IEventAggregator events, 
+                            IConfigurationSettings configuration, 
+                            IFileSystem fileSystem,
+                            ISongFactory songFactory,
+                            IPlaylistBuilder builder)
         {
             _events = events;
             _events.Subscribe(this);
             _configuration = configuration;
+            _fileSystem = fileSystem;
             _songFactory = songFactory;
+            _playlistBuilder = builder;
 
             _player = new MediaPlayer();
             _player.MediaFailed += Player_MediaFailed;
@@ -155,31 +167,28 @@ namespace Bolognese.Desktop
         async Task IMediaManager.BuildPlaylist(string audioFilePath)
         {
             if (string.IsNullOrEmpty(audioFilePath)
-                || !Directory.Exists(audioFilePath))
+                || !_fileSystem.Directory.Exists(audioFilePath))
             {
                 throw new InvalidOperationException("Music Folder Does Not Exist");
             }
 
             Playlist current = await GeneratePlaylistFromFolder(audioFilePath);
+            var ready = new PlaylistReady
+            {
+                Playlist = current
+            };
 
-            var trackManager = this as IMediaManager;
-            trackManager.OpenPlaylist(current);
-            trackManager.OpenNextSong();
+            _events.PublishOnUIThread(ready);
         }
 
         private async Task<Playlist> GeneratePlaylistFromFolder(string audioFilePath)
         {
             var list = await Task.Run(() =>
             {
-                Playlist playlist = new Playlist();
-                playlist.Name = audioFilePath;
-                DirectoryInfo directory = new DirectoryInfo(audioFilePath);
-
-                foreach (FileInfo file in directory.GetFiles("*.mp3"))
-                {
-                    Song song = _songFactory.GetSongFromFile(file);
-                    playlist.Songs.Add(song);
-                }
+                var songs = _songFactory.GetSongs(audioFilePath);
+                var rnd = new Random();
+                var randomSongs = songs.OrderBy(x => rnd.Next());
+                var playlist = _playlistBuilder.GeneratePlaylist(randomSongs, _configuration.PomodoroDuration, 2);
 
                 return playlist;
             });
@@ -189,7 +198,7 @@ namespace Bolognese.Desktop
 
         private void OpenSong(Song song)
         {
-            Uri songUri = new Uri(song.FilePath, UriKind.Absolute);
+            Uri songUri = new Uri(song.Path, UriKind.Absolute);
             _player.Open(songUri);
             _currentSong = song;
         }
@@ -234,6 +243,13 @@ namespace Bolognese.Desktop
                 default:
                     throw new InvalidOperationException("Unknown Media Request");
             }
+        }
+
+        void IHandle<PlaylistReady>.Handle(PlaylistReady message)
+        {
+            var trackManager = this as IMediaManager;
+            trackManager.OpenPlaylist(message.Playlist);
+            trackManager.OpenNextSong();
         }
     }
 }
