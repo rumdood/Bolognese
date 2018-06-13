@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows;
+using System.IO.Abstractions;
 using Caliburn.Micro;
 using Bolognese.Desktop.Contracts;
 using Bolognese.Desktop.ViewModels;
@@ -45,7 +46,9 @@ namespace Bolognese.Desktop
             _container.Singleton<IPomodoroManager, PomodoroManager>();
             _container.Singleton<IPomodoroSegmentFactory, PomodoroSegmentFactory>();
             _container.Singleton<IMediaManager, TrackManager>();
-            _container.Singleton<ISongFactory, SongFactory>();
+            _container.Singleton<ISongFactory, FileSystemSongFactory>();
+            _container.Singleton<IPlaylistBuilder, PlaylistBuilder>();
+            _container.Singleton<IFileSystem, FileSystem>();
             //_container.PerRequest<IShell, TrayShellViewModel>();
             //_container.Singleton<IConductActiveItem, ShellViewModel>("RealShell");
             _container.PerRequest<IShell, ShellViewModel>("RealShell");

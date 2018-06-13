@@ -20,13 +20,13 @@ namespace Bolognese.Common.Media
 
             foreach (var song in songs)
             {
-                if (song.Duration.TotalSeconds >= maxRemainder)
+                if (song.Duration.TotalMinutes >= maxRemainder)
                 {
                     continue;
                 }
 
                 output.Songs.Add(song);
-                playlistLength += song.Duration.TotalSeconds;
+                playlistLength += song.Duration.TotalMinutes;
                 maxRemainder = upperBound - playlistLength;
 
                 if (maxRemainder <= (upperBound - lowerBound))

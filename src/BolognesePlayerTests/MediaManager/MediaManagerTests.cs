@@ -5,7 +5,9 @@ using Caliburn.Micro;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System;
-using System.IO;
+using System.Collections.Generic;
+using System.IO.Abstractions;
+using System.IO.Abstractions.TestingHelpers;
 
 namespace BolognesePlayerTests.MediaManager
 {
@@ -18,6 +20,8 @@ namespace BolognesePlayerTests.MediaManager
         Mock<IConfigurationSettings> _settings;
         Mock<IEventAggregator> _events;
         Mock<ISongFactory> _factory;
+        IPlaylistBuilder _builder;
+        IFileSystem _fileSystem;
         TrackManager _manager;
         Song _theSong;
 
@@ -28,14 +32,26 @@ namespace BolognesePlayerTests.MediaManager
             //
         }
 
+        internal IEnumerable<Song> GetSongs()
+        {
+            var song1 = new Song(@"c:\foo\", "Song1", TimeSpan.FromSeconds(600));
+            var song2 = new Song(@"c:\foo\", "Song2", TimeSpan.FromSeconds(300));
+            var song3 = new Song(@"c:\foo\", "Song3", TimeSpan.FromSeconds(450));
+
+            return new Song[] { song1, song2, song3 };
+        }
+
         [TestInitialize]
         public void Initialize()
         {
             _theSong = new Song(@"c:\foo\", "Foo", TimeSpan.FromSeconds(60));
+            _fileSystem = new MockFileSystem(new Dictionary<string, MockFileData>
+            {
+                { @"c:\foo\Foo.mp3", new MockFileData("This won't work") }
+            });
             _events = new Mock<IEventAggregator>();
 
             _factory = new Mock<ISongFactory>();
-            _factory.Setup(factory => factory.GetSongFromFile(It.IsAny<FileInfo>())).Returns(_theSong);
 
             _settings = new Mock<IConfigurationSettings>().SetupAllProperties();
             _settings.Object.AudioFilePath = @"D:\CloudStorage\OneDrive\Music\Carl Franklin\Music To Code By";
@@ -45,7 +61,11 @@ namespace BolognesePlayerTests.MediaManager
             _settings.Object.PomodoroDuration = 1;
             _settings.Object.Shuffle = false;
 
-            _manager = new TrackManager(_events.Object, _settings.Object, _factory.Object);
+            _manager = new TrackManager(_events.Object, 
+                                        _settings.Object, 
+                                        _fileSystem, 
+                                        _factory.Object, 
+                                        _builder);
         }
 
         internal int BuildPlaylist1(int[] lengths)

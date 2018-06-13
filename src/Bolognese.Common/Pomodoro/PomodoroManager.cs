@@ -7,7 +7,10 @@ using System.Timers;
 
 namespace Bolognese.Common.Pomodoro
 {
-    public class PomodoroManager : IPomodoroManager, IHandle<MediaStatusChanged>, IHandle<SegmentRequest>, IHandle<MediaProgress>
+    public class PomodoroManager : IPomodoroManager, 
+                                   IHandle<MediaStatusChanged>, 
+                                   IHandle<SegmentRequest>, 
+                                   IHandle<MediaProgress>
     {
         readonly IConfigurationSettings _settings;
         readonly IPomodoroSegmentFactory _factory;
