@@ -11,6 +11,7 @@ using Bolognese.Desktop.Configuration;
 
 namespace Bolognese.Desktop
 {
+    // this will fix it.
     public class BologneseBoostrapper : BootstrapperBase
     {
         readonly SimpleContainer _container = new SimpleContainer();

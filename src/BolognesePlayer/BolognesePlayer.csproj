@@ -92,6 +92,7 @@
     </Compile>
     <Compile Include="Events\ShowPlayerRequested.cs" />
     <Compile Include="Alerts\Alerter.cs" />
+    <Compile Include="Media\PomodoroTrackManager.cs" />
     <Compile Include="Media\SongFactory.cs" />
     <Compile Include="Media\TrackManager.cs" />
     <Compile Include="ViewModels\SmallPlayerViewModel.cs" />
